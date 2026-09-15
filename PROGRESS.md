@@ -28,7 +28,11 @@
    - MPV AAR 依赖（libs/，109MB 本地，不入 git）
    - PreferencesHelper 裁剪 WebDAV/SMB/AList 网盘段（C 组不移植）
    - 深色黑金主题 Theme.StarCinema（star_bg/star_gold/star_card/star_text）
-   - MainActivity 占位壳（M3 重写为抽屉+Fragment）
+9. ✅ **M2 播放页接入完成**（v0.2.0）：
+   - PlayerActivity（1631 行）+ TrackSelectionAdapter + danmu 模块 5 文件 + 播放页 6 layout + 全量 drawable/color/raw 资源
+   - DanmakuFlameMaster 弹幕依赖
+   - ✅ **小米盒子真机验证通过**：测试服务器 28096 拉流，《"大"人物》成功播放（EXO/MPV 内核工作正常），focus 已进 PlayerActivity
+   - MainActivity 临时验证入口（M3 重写为抽屉+Fragment）
    - ✅ **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
 ## 三、待办（下一步）
