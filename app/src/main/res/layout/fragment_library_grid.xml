@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 星光影院：媒体库页定稿规格——标题独立一行（大字号），筛选标签在标题下方独立一行 -->
+<!-- 星光影院：媒体库页（设计文档 v1.0）——左侧常驻 18% 导航 + 右侧 4×3 横版网格 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -20,130 +20,197 @@
         android:layout_height="match_parent"
         android:background="#B30B0C10" />
 
-    <LinearLayout
+    <!-- 根布局：侧栏 18% + 内容区 82% -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <!-- 星光影院：标题独立一行（大字号、左对齐、顶部留空给顶部 nav） -->
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="40dp"
-            android:paddingEnd="40dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="16dp"
-            android:textColor="@color/star_text"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:text="电影" />
-
-        <!-- 星光影院：筛选标签（全部/最新/高分/年份/类型）在标题下方独立一行 -->
+        <!-- ===== 左侧导航栏（常驻 18%，与首页一致） ===== -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingStart="40dp"
-            android:paddingEnd="40dp"
-            android:paddingBottom="12dp"
-            android:gravity="center_vertical">
+            android:id="@+id/librarySidebar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_drawer"
+            app:layout_constraintWidth_percent="0.18"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:id="@+id/filterAll"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_sidebar_normal"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
-                android:gravity="center"
-                android:text="全部"
-                android:textColor="@color/star_text_secondary"
-                android:textSize="14sp"
-                android:nextFocusRight="@id/filterLatest" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="16dp">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_logo"
+                    android:contentDescription="星光影院" />
 
-            <TextView
-                android:id="@+id/filterLatest"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_sidebar_normal"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
-                android:gravity="center"
-                android:text="最新"
-                android:textColor="@color/star_text_secondary"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"
-                android:nextFocusLeft="@id/filterAll"
-                android:nextFocusRight="@id/filterTop" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="星光影院"
+                    android:textColor="@color/star_gold"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/filterTop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_sidebar_normal"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
-                android:gravity="center"
-                android:text="高分"
-                android:textColor="@color/star_text_secondary"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"
-                android:nextFocusLeft="@id/filterLatest"
-                android:nextFocusRight="@id/filterYear" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="#26E8B64C" />
 
-            <TextView
-                android:id="@+id/filterYear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_sidebar_normal"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
-                android:gravity="center"
-                android:text="年份 ▾"
-                android:textColor="@color/star_text_secondary"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"
-                android:nextFocusLeft="@id/filterTop"
-                android:nextFocusRight="@id/filterGenre" />
-
-            <TextView
-                android:id="@+id/filterGenre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="true"
-                android:clickable="true"
-                android:background="@drawable/bg_sidebar_normal"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="6dp"
-                android:gravity="center"
-                android:text="类型 ▾"
-                android:textColor="@color/star_text_secondary"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"
-                android:nextFocusLeft="@id/filterYear" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/libraryList"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp" />
         </LinearLayout>
 
-        <!-- 星光影院：3×4 网格（设计稿规格 3 行 × 4 列 = 12 张/屏） -->
-        <com.rubensousa.dpadrecyclerview.DpadRecyclerView
-            android:id="@+id/gridRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp" />
-    </LinearLayout>
+        <!-- ===== 右侧 82% 内容区 ===== -->
+        <LinearLayout
+            android:id="@+id/contentArea"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintWidth_percent="0.82"
+            app:layout_constraintStart_toEndOf="@id/librarySidebar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- 大标题（左对齐，顶部留空给顶部 nav） -->
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="16dp"
+                android:textColor="@color/star_text"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:text="电影" />
+
+            <!-- 筛选标签（全部/最新/高分/年份/类型） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:paddingBottom="12dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/filterAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_sidebar_normal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:gravity="center"
+                    android:text="全部"
+                    android:textColor="@color/star_text_secondary"
+                    android:textSize="14sp"
+                    android:nextFocusRight="@id/filterLatest" />
+
+                <TextView
+                    android:id="@+id/filterLatest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_sidebar_normal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:gravity="center"
+                    android:text="最新"
+                    android:textColor="@color/star_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:nextFocusLeft="@id/filterAll"
+                    android:nextFocusRight="@id/filterTop" />
+
+                <TextView
+                    android:id="@+id/filterTop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_sidebar_normal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:gravity="center"
+                    android:text="高分"
+                    android:textColor="@color/star_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:nextFocusLeft="@id/filterLatest"
+                    android:nextFocusRight="@id/filterYear" />
+
+                <TextView
+                    android:id="@+id/filterYear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_sidebar_normal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:gravity="center"
+                    android:text="年份 ▾"
+                    android:textColor="@color/star_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:nextFocusLeft="@id/filterTop"
+                    android:nextFocusRight="@id/filterGenre" />
+
+                <TextView
+                    android:id="@+id/filterGenre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="true"
+                    android:clickable="true"
+                    android:background="@drawable/bg_sidebar_normal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="6dp"
+                    android:gravity="center"
+                    android:text="类型 ▾"
+                    android:textColor="@color/star_text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
+                    android:nextFocusLeft="@id/filterYear" />
+            </LinearLayout>
+
+            <!-- 4×3 横版网格（12 张/屏） -->
+            <com.rubensousa.dpadrecyclerview.DpadRecyclerView
+                android:id="@+id/gridRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar
         android:id="@+id/loadingIndicator"

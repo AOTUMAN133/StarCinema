@@ -71,9 +71,12 @@ class LibraryGridFragment : Fragment() {
 
         binding.titleText.text = libraryName
 
+        // 设计文档 v1.0：媒体库页左侧常驻 18% 导航栏（Logo + 首页/搜索/设置 + 媒体库列表）
+        setupSidebar()
+
         val props = RecyclerView.LayoutManager.Properties().apply {
             orientation = RecyclerView.VERTICAL
-            spanCount = 4 // 星光影院：定稿规格 3行×4列（设计稿）
+            spanCount = 4 // 设计文档 v1.0：4列×3行 横版网格（12 张/屏）
         }
         binding.gridRecyclerView.layoutManager = PivotLayoutManager(props)
 
@@ -108,6 +111,48 @@ class LibraryGridFragment : Fragment() {
         wireFilter(binding.filterGenre, swallowLeft = false, swallowRight = true)
 
         loadItems()
+    }
+
+    /** 设计文档 v1.0：媒体库页左侧常驻导航栏（Logo + 首页/搜索/设置 + 媒体库列表，与首页一致） */
+    private fun setupSidebar() {
+        val sidebarAdapter = SidebarAdapter { item ->
+            when (item) {
+                is SidebarItem.Entry -> when (item.key) {
+                    "home" -> parentFragmentManager.popBackStack()
+                    "search" -> parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_container, SearchFragment())
+                        .addToBackStack("home")
+                        .commitAllowingStateLoss()
+                    "settings" -> parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_container, SettingsFragment())
+                        .addToBackStack("home")
+                        .commitAllowingStateLoss()
+                }
+                is SidebarItem.Lib -> {
+                    // 切换媒体库：replace 自身
+                    val bundle = Bundle().apply {
+                        putString("libraryId", item.lib.id)
+                        putString("libraryName", item.lib.name)
+                        putString("collectionType", item.lib.collectionType)
+                    }
+                    val frag = LibraryGridFragment()
+                    frag.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_container, frag)
+                        .commitAllowingStateLoss()
+                }
+            }
+        }
+        binding.libraryList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+        binding.libraryList.adapter = sidebarAdapter
+        // 填充固定入口 + 动态媒体库列表
+        val items = mutableListOf<SidebarItem>()
+        items.add(SidebarItem.Entry("home", "首页"))
+        items.add(SidebarItem.Entry("search", "搜索"))
+        items.add(SidebarItem.Lib(com.starcinema.api.EmbyLibrary(libraryId, libraryName, collectionType ?: "movies", collectionType)))
+        items.add(SidebarItem.Entry("settings", "设置"))
+        sidebarAdapter.submitList(items)
+        // 侧栏可聚焦：媒体库列表首项即为当前库（选中态由 Adapter 的 onFocusChange 控制）
     }
 
     /** 排序对话框：选择排序字段 + 升降序 */

@@ -20,11 +20,12 @@
             android:layout_marginBottom="-100dp"
             android:background="@drawable/bg_glow_gold" />
 
-        <!-- 左侧：添加服务器（金渐变大卡） -->
+        <!-- 左侧：添加服务器（金渐变大卡，占 40% 宽） -->
         <LinearLayout
             android:id="@+id/addServerBtn"
-            android:layout_width="300dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="0.4"
             android:orientation="vertical"
             android:gravity="center"
             android:background="@drawable/bg_add_server"
@@ -52,11 +53,11 @@
                 android:textColor="@color/star_bg" />
         </LinearLayout>
 
-        <!-- 右侧：服务器列表 -->
+        <!-- 右侧：服务器列表（占 60% 宽） -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.6"
             android:layout_marginStart="24dp"
             android:orientation="vertical">
 
