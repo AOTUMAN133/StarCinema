@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：Hero 卡内渐变遮罩（左深右浅+下深上浅，保文字可读） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#CC0B0C10"
+        android:centerColor="#660B0C10"
+        android:endColor="#330B0C10"
+        android:angle="0" />
+</shape>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：左下角金色光晕（抽象背景光效） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:startColor="#33E8B64C"
+        android:endColor="#00E8B64C"
+        android:type="radial"
+        android:gradientRadius="60%p" />
+</shape>

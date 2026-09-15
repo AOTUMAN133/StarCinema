@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 搜索框行 -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="14dp">
+
+            <EditText
+                android:id="@+id/searchEdit"
+                android:textSize="18sp"
+                android:background="@drawable/search_box_back"
+                android:paddingHorizontal="28dp"
+                android:focusable="true"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:hint="搜索电影 / 剧集 / 演员..."
+                android:textColor="@color/md_theme_onSurface"
+                android:textColorHint="@color/md_theme_onSurfaceVariant"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:nextFocusRight="@id/searchBtn"
+                android:nextFocusDown="@id/searchChips" />
+
+            <LinearLayout
+                android:gravity="center"
+                android:id="@+id/searchBtn"
+                android:background="@drawable/btn_select_circle"
+                android:focusable="true"
+                android:nextFocusLeft="@id/searchEdit"
+                android:nextFocusDown="@id/searchChips"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:paddingHorizontal="18dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/search"
+                    app:tint="@color/star_gold" />
+
+                <TextView
+                    android:textSize="18sp"
+                    android:text="搜索"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/md_theme_onSurface" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 星光影院：热门搜索 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="18dp">
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="10dp"
+                android:background="@color/star_gold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="热门搜索"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/hotWordRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginTop="10dp"
+            android:clipToPadding="false">
+
+            <TextView
+                android:id="@+id/hotWord1"
+                style="@style/HotWordTag"
+                android:text="科幻" />
+            <TextView
+                android:id="@+id/hotWord2"
+                style="@style/HotWordTag"
+                android:text="高分" />
+            <TextView
+                android:id="@+id/hotWord3"
+                style="@style/HotWordTag"
+                android:text="经典" />
+            <TextView
+                android:id="@+id/hotWord4"
+                style="@style/HotWordTag"
+                android:text="悬疑" />
+            <TextView
+                android:id="@+id/hotWord5"
+                style="@style/HotWordTag"
+                android:text="动画" />
+        </LinearLayout>
+
+        <!-- 分类筛选 Chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/searchChips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginTop="8dp"
+            android:focusable="true"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedChip="@id/chipAll"
+            app:chipSpacingHorizontal="10dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="全部"
+                android:foreground="@drawable/btn_select_circle" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipMovie"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="电影"
+                android:foreground="@drawable/btn_select_circle" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipSeries"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="剧集"
+                android:foreground="@drawable/btn_select_circle" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipEpisode"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="单集"
+                android:foreground="@drawable/btn_select_circle" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- 星光影院：默认推荐标题（搜索前"大家都在看"） -->
+        <LinearLayout
+            android:id="@+id/defaultTitleRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="10dp"
+                android:background="@color/star_gold" />
+
+            <TextView
+                android:id="@+id/defaultTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="大家都在看"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/emptyHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="160dp"
+            android:text="输入关键词开始搜索"
+            android:textSize="16sp"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:visibility="visible" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="80dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="7dp"
+    android:layout_marginEnd="7dp"
+    android:focusable="true"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:clipChildren="false">
+
+    <!-- 圆形演员头像：正方形 + 圆角=宽/2 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/imageBox"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:clipToOutline="true"
+        app:cardCornerRadius="45dp"
+        app:cardBackgroundColor="#C0000000"
+        app:cardElevation="4dp"
+        app:strokeColor="#00FFFFFF"
+        app:strokeWidth="2dp">
+
+        <ImageView
+            android:id="@+id/posterImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingHorizontal="1dp"
+        android:textColor="@color/apple_text"
+        android:textSize="14sp" />
+
+</LinearLayout>

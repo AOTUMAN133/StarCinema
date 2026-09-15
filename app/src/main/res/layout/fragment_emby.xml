@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF0B0C10"
+    android:animateLayoutChanges="true"
+    android:clipChildren="false">
+
+    <!-- 全屏背景图已删除（Hero 是独立横幅区，与全屏背景无关） -->
+
+    <View
+        android:id="@+id/mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_home_gradient_light" />
+
+    <!-- SenPlayer 式底部渐变遮罩 (浅色) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_home_bottom_gradient_light" />
+
+    <!-- ===== 首页内容区（全宽，抽屉展开时整体右移） ===== -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/homeContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:clipChildren="false"
+        android:nextFocusUp="@id/mediaSourceList"
+        android:focusable="false">
+
+        <LinearLayout
+            android:id="@+id/homeColumn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:clipChildren="false">
+
+            <!-- 定稿 Hero：全宽横幅（实测：占内容区全宽、高~35%屏高≈190dp、白色大标题+金色立即播放按钮+右下指示点；无描边无投影） -->
+            <FrameLayout
+                android:id="@+id/bannerArea"
+                android:layout_width="match_parent"
+                android:layout_height="190dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="46dp"
+                android:visibility="gone"
+                android:focusable="true"
+                android:clipChildren="false">
+
+                <!-- Hero 背景图（全宽横幅，圆角裁切在卡内） -->
+                <ImageView
+                    android:id="@+id/heroBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background"
+                    android:background="@drawable/bg_hero_card" />
+
+                <!-- 底部渐变遮罩（文字可读） -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_hero_overlay" />
+
+                <!-- 左侧文字区：白色大标题 + 副标语 + 金色立即播放按钮（设计稿：左上偏下排布） -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="start|bottom"
+                    android:layout_marginStart="36dp"
+                    android:layout_marginBottom="30dp">
+
+                    <!-- 白色书法大标题（定稿：白色，非金色） -->
+                    <TextView
+                        android:id="@+id/bannerTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="34sp"
+                        android:textStyle="bold"
+                        android:fontFamily="serif"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:shadowColor="#80000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="4" />
+
+                    <!-- 白色副标语 -->
+                    <TextView
+                        android:id="@+id/bannerOverview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="15sp"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
+                    <!-- 金色胶囊"立即播放"按钮（定稿：▶+黑字黑图标；不可聚焦，避免抢走 Hero 焦点，OK 键由 Hero 统一处理） -->
+                    <LinearLayout
+                        android:id="@+id/bannerPlayBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/bg_btn_gold"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:focusable="false"
+                        android:paddingHorizontal="18dp"
+                        android:paddingVertical="7dp">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_action_play_black"
+                            android:contentDescription="播放" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="立即播放"
+                            android:textColor="@color/star_bg"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 轮播指示点（定稿：右下角） -->
+                <LinearLayout
+                    android:id="@+id/bannerDots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal" />
+            </FrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/mediaSourceList"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipChildren="false"
+                android:clipToPadding="false" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ===== 抽屉层（覆盖式：遮罩 + 导航抽屉） ===== -->
+    <View
+        android:id="@+id/drawerScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000"
+        android:clickable="true"
+        android:focusable="false"
+        android:visibility="gone" />
+
+    <!-- 导航抽屉（星光影院：深黑+暗金光晕，可开合） -->
+    <LinearLayout
+        android:id="@+id/librarySidebar"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_drawer"
+        android:elevation="24dp"
+        android:clipChildren="false"
+        android:translationX="-200dp">
+
+        <!-- 星光影院 Logo：金色五角星 + 星光影院 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="16dp">
+            <!-- 定稿图 Logo：胶片+播放键 + 星光影院 -->
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:src="@drawable/ic_logo"
+                            android:contentDescription="星光影院" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="星光影院"
+                            android:textColor="@color/star_gold"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="#26E8B64C" />
+
+        <!-- 上滚提示箭头 -->
+        <TextView
+            android:id="@+id/sidebarUpArrow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="▲"
+            android:textColor="#66FFFFFF"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/libraryList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            android:paddingTop="4dp" />
+
+        <!-- 下滚提示箭头 -->
+        <TextView
+            android:id="@+id/sidebarDownArrow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="▼"
+            android:textColor="#66FFFFFF"
+            android:textSize="10sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loadingIndicator"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/errorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="gone" />
+</FrameLayout>

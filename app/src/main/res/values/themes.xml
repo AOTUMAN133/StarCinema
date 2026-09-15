@@ -24,4 +24,19 @@
         <item name="android:statusBarColor">@color/star_bg</item>
         <item name="android:navigationBarColor">@color/star_bg</item>
     </style>
+
+    <!-- 星光影院：热门搜索标签（胶囊） -->
+    <style name="HotWordTag">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:background">@drawable/bg_season_tab_idle</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingHorizontal">20dp</item>
+        <item name="android:paddingVertical">8dp</item>
+        <item name="android:textColor">@color/star_text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 </resources>

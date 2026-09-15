@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:paddingTop="48dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="通用设置"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_onSurface"
+            android:paddingBottom="12dp" />
+
+        <!-- 本地库设置 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/localLibBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:nextFocusUp="@id/clearCacheBox"
+            android:nextFocusDown="@id/focusStyleBox"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="本地库设置"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="管理本地视频库/文件夹" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 焦点样式设置 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/focusStyleBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:layout_marginTop="8dp"
+            android:nextFocusUp="@id/localLibBox"
+            android:nextFocusDown="@id/homePageBox"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="焦点样式"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="边框颜色 / 缩放 / 动画效果" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 首页设置 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/homePageBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:layout_marginTop="8dp"
+            android:nextFocusUp="@id/focusStyleBox"
+            android:nextFocusDown="@id/posterBox"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="首页设置"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="Banner 显示 / 首页布局 / 分类" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 海报设置 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/posterBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:layout_marginTop="8dp"
+            android:nextFocusUp="@id/homePageBox"
+            android:nextFocusDown="@id/hideHistoryBox"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="海报设置"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="海报显示模式 / 缩放" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 隐藏历史记录 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/hideHistoryBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:layout_marginTop="8dp"
+            android:nextFocusUp="@id/posterBox"
+            android:nextFocusDown="@id/clearHistoryBox"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/hideHistorySwitch">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="隐藏历史记录"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="首页不显示播放历史" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/hideHistorySwitch"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 清除历史记录 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clearHistoryBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:layout_marginTop="8dp"
+            android:nextFocusUp="@id/hideHistoryBox"
+            android:nextFocusDown="@id/clearCacheBox"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="清除历史记录"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="删除所有播放历史记录" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 清除缓存 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clearCacheBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:focusable="true"
+            android:nextFocusUp="@id/clearHistoryBox"
+            android:nextFocusDown="@id/localLibBox"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/video_selector">
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+                <TextView android:textSize="16sp" android:textStyle="bold"
+                    android:textColor="@color/md_theme_onSurface" android:text="清除缓存"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                <TextView android:textSize="14sp" android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:text="清除图片缓存以释放空间" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>

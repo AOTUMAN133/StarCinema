@@ -103,6 +103,9 @@ dependencies {
     implementation("org.jellyfin.media3:media3-ffmpeg-decoder:1.6.1+1")
     implementation("io.github.peerless2012:ass-media:0.5.1")
 
+    // 弹幕渲染（DanmakuFlameMaster）
+    implementation("com.github.bilibili:DanmakuFlameMaster:0.9.25")
+
     // MPV 内核（fongmi 修改版，含杜比视界直通支持）
     implementation(files("libs/mpv-android-lib-0.1.12-fongmi.aar"))
 }

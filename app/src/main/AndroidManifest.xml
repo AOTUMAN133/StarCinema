@@ -24,6 +24,13 @@
         android:theme="@style/Theme.StarCinema">
 
         <activity
+            android:name=".view.PlayerActivity"
+            android:exported="false"
+            android:launchMode="standard"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode"
+            android:theme="@style/Theme.StarCinema" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode"

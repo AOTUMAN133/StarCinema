@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院详情页：左侧深色渐变遮罩（左深右浅，保证左信息可读） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#F00B0C10"
+        android:centerColor="#B00B0C10"
+        android:endColor="#400B0C10"
+        android:angle="0" />
+</shape>
