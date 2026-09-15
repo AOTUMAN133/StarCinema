@@ -18,8 +18,6 @@ import com.starcinema.api.EmbyLibrary
 import com.starcinema.app.PreferencesHelper
 import com.starcinema.databinding.FragmentEmbyBinding
 import com.starcinema.model.VideoType
-import com.starcinema.app.EmbyServerConfig
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 /**
@@ -103,35 +101,12 @@ class EmbyFragment : Fragment() {
         val prefs = PreferencesHelper(requireContext())
         val server = prefs.activeEmbyServer()
         if (server == null) {
-            // M3 临时引导：无服务器时自动连接测试服务器（M5 正式登录页后替换）
+            // 无服务器：引导用户到服务器列表添加（隐私信息只存本地 SharedPreferences，绝不入源码）
             view.post {
-                binding.loadingIndicator.visibility = View.VISIBLE
-                binding.errorText.visibility = View.GONE
-                viewLifecycleOwner.lifecycleScope.launch {
-                    val result = client.authenticateByPassword("http://192.168.1.33:28096", "533", "123321")
-                    result.onSuccess { auth ->
-                        val cfg = EmbyServerConfig(
-                            id = "test-28096",
-                            name = "馋死你",
-                            baseUrl = "http://192.168.1.33:28096",
-                            accessToken = auth.accessToken ?: "",
-                            userId = auth.userId ?: "",
-                            userName = auth.userName ?: ""
-                        )
-                        prefs.upsertEmbyServer(cfg)
-                        baseUrl = cfg.baseUrl
-                        apiKey = cfg.accessToken
-                        userId = cfg.userId
-                        client.serverType = cfg.serverType
-                        setupHomeList()
-                        wireHeroControls()
-                        loadHomeData()
-                    }.onFailure { e ->
-                        binding.loadingIndicator.visibility = View.GONE
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = "自动连接服务器失败：${e.message ?: "未知错误"}"
-                    }
-                }
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_container, com.starcinema.view.ServerListFragment())
+                    .addToBackStack("home")
+                    .commitAllowingStateLoss()
             }
             return
         }
