@@ -114,8 +114,6 @@ class ServerEditFragment : Fragment() {
             ?: url.substringAfter("://").substringBefore(":").substringBefore("/")
 
         // 如果还没认证过，先自动登录一次再保存
-
-        // 如果还没认证过，先自动登录一次再保存
         if (authAccessToken.isBlank()) {
             val username = binding.username.text?.toString()?.trim()
             val password = binding.password.text?.toString()
