@@ -1,0 +1,15 @@
+# Gradle
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+*.keystore
+!debug.keystore
+# 大文件 AAR 不入库
+/libs/*.aar
