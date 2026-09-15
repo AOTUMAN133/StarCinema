@@ -47,6 +47,9 @@ class SearchFragment : Fragment() {
             client.serverType = server.serverType
         }
 
+        // 设计文档 v1.0：搜索页左侧常驻 18% 导航栏
+        setupSidebar()
+
         binding.searchList.layoutManager = GridLayoutManager(requireContext(), 4)
 
         // 星光影院：搜索前显示"大家都在看"（默认推荐）
@@ -180,6 +183,42 @@ class SearchFragment : Fragment() {
                     binding.emptyHint.visibility = View.VISIBLE
                 }
         }
+    }
+
+    /** 设计文档 v1.0：搜索页左侧常驻导航栏（Logo + 首页/搜索/设置 + 媒体库列表，与首页一致） */
+    private fun setupSidebar() {
+        val sidebarAdapter = SidebarAdapter { item ->
+            when (item) {
+                is SidebarItem.Entry -> when (item.key) {
+                    "home" -> parentFragmentManager.popBackStack()
+                    "search" -> { /* 已在搜索页 */ }
+                    "settings" -> parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_container, SettingsFragment())
+                        .addToBackStack("home")
+                        .commitAllowingStateLoss()
+                }
+                is SidebarItem.Lib -> {
+                    val bundle = Bundle().apply {
+                        putString("libraryId", item.lib.id)
+                        putString("libraryName", item.lib.name)
+                        putString("collectionType", item.lib.collectionType)
+                    }
+                    val frag = LibraryGridFragment()
+                    frag.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_container, frag)
+                        .addToBackStack("home")
+                        .commitAllowingStateLoss()
+                }
+            }
+        }
+        binding.libraryList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+        binding.libraryList.adapter = sidebarAdapter
+        val items = mutableListOf<SidebarItem>()
+        items.add(SidebarItem.Entry("home", "首页"))
+        items.add(SidebarItem.Entry("search", "搜索"))
+        items.add(SidebarItem.Entry("settings", "设置"))
+        sidebarAdapter.submitList(items)
     }
 
     private fun openDetail(item: EmbyItem) {

@@ -69,8 +69,10 @@ class PersonWorksFragment : Fragment() {
             client.getPersonWorks(baseUrl, apiKey, userId, personId).onSuccess { works ->
                 binding.loadingIndicator.visibility = View.GONE
                 if (works.isEmpty()) return@onSuccess
+                // 设计文档 v1.0：作品年表按年份倒序（2023→2015）
+                val sorted = works.sortedByDescending { it.productionYear ?: 0 }
                 binding.videoList.adapter = HorizontalItemAdapter(
-                    works, baseUrl, apiKey, client,
+                    sorted, baseUrl, apiKey, client,
                     onClick = { item ->
                         DetailFragment.open(requireActivity().supportFragmentManager, item)
                     },
