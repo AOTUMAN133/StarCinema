@@ -39,12 +39,16 @@
    - VideoTypeRecyclerAdapterDiff + **LibraryGridFragment（M4 前置搬运）**
    - 临时自动连接测试服务器（M5 登录页后替换）；openDetail/搜索/设置暂为 M5 占位
    - ✅ **小米盒子真机验证通过**：首页 Hero 轮播真实数据、《出入平安》《丰臣兄弟》等海报行完整、抽屉展开正常
+11. ✅ **M4 媒体库页完成**（v0.4.0）：
+   - LibraryGridFragment：大标题 + 筛选标签（全部/最新/高分/年份▾/类型▾）+ **3×4 海报网格**（无角标、评分纯数字金色、卡内标题白）——对齐 design-media-library.md 定稿
+   - 修复 GridAdapter 引用已删除角标导致的崩溃（item_grid_card.xml 按定稿已删 unwatchedBadge）
+   - ✅ **小米盒子真机验证通过**：动画库 3×4 网格、筛选标签齐全（选中金色胶囊）、标题+评分显示正常
    - ✅ **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
 ## 三、待办（下一步）
 
-- [ ] M2 播放页接入：搬运 PlayerActivity（整体搬）+ TrackSelectionAdapter + 播放页 layout + 简单入口验证可播放
-- [ ] M3 抽屉+首页（Hero 轮播 + 内容行）→ M4 媒体库 → M5 详情/搜索/设置 → M6 打磨
+- [ ] M5 详情页 + 搜索页 + 设置页（DetailFragment/SearchFragment/SettingsFragment 按设计稿 04/05/07/08 + 服务器登录）→ 替换临时自动连接
+- [ ] M6 打磨：焦点/动画/空态/加载态，全流程体验
 
 ## 四、关键技术备忘（来自旧项目调试）
 
