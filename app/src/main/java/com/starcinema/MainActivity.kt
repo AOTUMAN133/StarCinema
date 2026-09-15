@@ -95,12 +95,12 @@ class MainActivity : AppCompatActivity() {
                 if (isLibraryGrid) android.view.View.INVISIBLE else android.view.View.VISIBLE
         }
 
-        // 标准返回处理：抽屉打开先关抽屉 → 再 pop 子页面 → 栈空才退出
+        // 标准返回处理：导航栏内返回先回内容区 → 再 pop 子页面 → 栈空才退出
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // 1. 导航抽屉打开时先关抽屉
+                // 1. 焦点在左侧导航栏内 → 先回内容区
                 val homeFrag = pageAdapter.pages.getOrNull(0)
-                if (homeFrag is EmbyFragment && homeFrag.isResumed && homeFrag.isDrawerOpen()) {
+                if (homeFrag is EmbyFragment && homeFrag.isResumed && homeFrag.isFocusInSidebar()) {
                     homeFrag.closeDrawerFromActivity()
                     return
                 }
@@ -119,8 +119,8 @@ class MainActivity : AppCompatActivity() {
         if (event.action == android.view.KeyEvent.ACTION_DOWN) {
             val frag = pageAdapter.pages.getOrNull(0)
             if (frag is EmbyFragment && frag.isResumed) {
-                // 抽屉开着时：右键关抽屉，左键吞掉
-                if (frag.isDrawerOpen()) {
+                // 焦点在左侧导航栏内：左键吞掉（导航栏内上下移动），右键回内容区
+                if (frag.isFocusInSidebar()) {
                     when (event.keyCode) {
                         android.view.KeyEvent.KEYCODE_DPAD_RIGHT -> {
                             frag.closeDrawerFromActivity()

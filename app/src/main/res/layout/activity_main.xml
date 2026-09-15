@@ -13,6 +13,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <!-- 左侧导航锚点（18%，与首页侧栏对齐）：顶部栏只覆盖右侧 82% 内容区 -->
+    <View
+        android:id="@+id/sidebarAnchor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintWidth_percent="0.18"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <!-- 首页层：ViewPager2 管理多 Fragment 页面 -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
@@ -31,15 +41,15 @@
     <!-- 定稿图顶部栏：左=菜单☰+Logo+星光影院；中=首页/搜索/设置(带图标)；右=时间+WiFi -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topNavBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="56dp"
         android:paddingTop="8dp"
         android:paddingBottom="4dp"
         android:focusable="false"
         android:descendantFocusability="afterDescendants"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintStart_toEndOf="@id/sidebarAnchor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <!-- 左：菜单按钮（抽屉入口提示） + Logo + 星光影院 -->
         <ImageView

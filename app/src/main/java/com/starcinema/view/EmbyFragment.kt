@@ -39,7 +39,7 @@ class EmbyFragment : Fragment() {
     private var lastClickedRow = -1 // 记录点击海报所在行
     private var lastClickedItem = -1 // 记录点击海报在行内的位置
     private lateinit var sidebarAdapter: SidebarAdapter
-    private var sidebarExpanded = false // 星光影院：抽屉默认收起
+    private var sidebarExpanded = false // 保留引用兼容（已改常驻导航，值不再驱动 UI）
 
     // ====== 星光影院：Hero 大横幅轮播 ======
     private val heroItems = mutableListOf<EmbyItem>()
@@ -176,43 +176,28 @@ class EmbyFragment : Fragment() {
             }
         })
 
-        // 星光影院：抽屉交互（遮罩点击收起 / 抽屉内右键或返回收起；左键在最左边缘无动作）
-        binding.drawerScrim.setOnClickListener { closeDrawer() }
+        // 常驻导航（设计文档 v1.0）：右键/返回从导航栏回内容区
         binding.librarySidebar.setOnKeyListener { _, keyCode, event ->
             if (event.action == android.view.KeyEvent.ACTION_DOWN &&
                 (keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT || keyCode == android.view.KeyEvent.KEYCODE_BACK)
             ) {
-                closeDrawer()
+                focusContent()
                 true
             } else false
         }
     }
 
-    /** 星光影院：打开导航抽屉（推挤式：抽屉滑出 + 首页内容缩窄让位 + 遮罩） */
-    private fun openDrawer() {
-        if (sidebarExpanded) return
-        sidebarExpanded = true
-        binding.drawerScrim.visibility = View.VISIBLE
-        binding.drawerScrim.alpha = 0f
-        binding.drawerScrim.animate().alpha(1f).setDuration(250).start()
-        binding.librarySidebar.animate().translationX(0f).setDuration(250).start()
-        // 星光影院：内容区缩窄让位（marginStart 动画，animateLayoutChanges 自动过渡）
-        val lp = binding.homeContent.layoutParams as android.widget.FrameLayout.LayoutParams
-        lp.marginStart = dp(200)
-        binding.homeContent.layoutParams = lp
-        // 抽屉打开时隐藏顶部栏（避免 Logo 与抽屉重叠）
-        activity?.findViewById<View>(R.id.topNavBar)?.visibility = View.GONE
-        // 🔴 焦点必须落到具体 item 而非 RecyclerView 本体，否则 DPAD_CENTER 不被消费 → 点击无反应。
-        //    循环重试：adapter 数据可能晚于抽屉动画填充（fillSidebar 在 loadHomeData 后），
-        //    一旦 item0 可用立即聚焦，最多重试 1.2s
+    /** 焦点移入左侧导航栏（常驻 18%，无需动画；首个可聚焦项） */
+    fun focusSidebar() {
+        if (!isAdded || _binding == null) return
         binding.libraryList.postDelayed({
             if (!isAdded || _binding == null) return@postDelayed
             tryFocusSidebarItem(0, 12)
-        }, 160)
+        }, 80)
     }
 
     private fun tryFocusSidebarItem(position: Int, attemptsLeft: Int) {
-        if (!isAdded || _binding == null || attemptsLeft <= 0 || sidebarExpanded.not()) return
+        if (!isAdded || _binding == null || attemptsLeft <= 0) return
         val vh = binding.libraryList.findViewHolderForAdapterPosition(position)
         if (vh != null) {
             vh.itemView.requestFocus()
@@ -221,17 +206,22 @@ class EmbyFragment : Fragment() {
         }
     }
 
-    /** 星光影院：全局左键兜底（MainActivity dispatchKeyEvent 调用），返回 true=已开抽屉。
-     * 只在焦点位于"最左边"时开抽屉（行标题/第一张海报/videoList 本体），
+    /** 焦点回内容区（第一行） */
+    fun focusContent() {
+        binding.mediaSourceList.post { binding.mediaSourceList.requestFocus() }
+    }
+
+    /** 星光影院：全局左键兜底（MainActivity dispatchKeyEvent 调用）。
+     * 焦点在内容区"最左元素"（行标题/最左海报）时按左 → 焦点移入导航栏；
      * 其余位置左键留给 DpadRecyclerView 在行内移动。force=true 用于 ☰ 按钮。 */
     fun onGlobalLeftKey(force: Boolean = false): Boolean {
-        if (sidebarExpanded || isHeroBannerFocused()) return false
+        if (isHeroBannerFocused()) return false
         if (!force && !isFocusAtLeftEdge()) return false
-        openDrawer()
+        focusSidebar()
         return true
     }
 
-    /** 焦点是否在内容区最左边（仅当焦点是"海报 item 且是该行可视最左一张"时返回 true） */
+    /** 焦点是否在内容区最左边（行标题 typeText / 该行可视最左海报） */
     private fun isFocusAtLeftEdge(): Boolean {
         val f = requireActivity().currentFocus ?: return false
         var videoList: com.rubensousa.dpadrecyclerview.DpadRecyclerView? = null
@@ -240,37 +230,31 @@ class EmbyFragment : Fragment() {
         while (cur != null && cur.parent !== binding.mediaSourceList) {
             if (cur is com.rubensousa.dpadrecyclerview.DpadRecyclerView) videoList = cur
             if (videoList != null && itemView == null && cur.parent === videoList) itemView = cur
-            // 🔴 行标题/更多 按左一律不开抽屉（用户要求：只有海报最左才弹）
-            if (cur.id == R.id.typeText || cur.id == R.id.moreText) return false
+            // 行标题是内容区最左元素 → 按左进导航栏；"更多"在右侧 → 不进
+            if (cur.id == R.id.typeText) return true
+            if (cur.id == R.id.moreText) return false
             cur = cur.parent as? android.view.View
         }
-        if (videoList == null || itemView == null) return false  // 非行内海报 → 不开抽屉
-        // 🔴 判断"该海报是可视区域最左一张"：其 left ≤ paddingStart（左边无其他可见海报）
+        if (videoList == null || itemView == null) return false  // 非行内海报 → 不进导航
+        // 该海报是可视区域最左一张：其 left ≤ paddingStart（左边无其他可见海报）
         return itemView.left <= videoList.paddingStart + 1  // +1 容许亚像素
     }
 
-    /** 抽屉是否打开（MainActivity 返回键判断） */
-    fun isDrawerOpen(): Boolean = sidebarExpanded
-
-    /** 关闭抽屉（MainActivity 返回键调用） */
-    fun closeDrawerFromActivity() {
-        closeDrawer()
+    /** 焦点是否在左侧导航栏内（MainActivity 返回键/右键判断） */
+    fun isFocusInSidebar(): Boolean {
+        val f = requireActivity().currentFocus ?: return false
+        var cur: android.view.View? = f
+        while (cur != null) {
+            if (cur === binding.librarySidebar || cur === binding.libraryList) return true
+            if (cur.parent === binding.libraryList) return true  // itemView 在 libraryList 内
+            cur = cur.parent as? android.view.View
+        }
+        return false
     }
 
-    /** 星光影院：收起导航抽屉（滑回 + 内容回位 + 遮罩淡出） */
-    private fun closeDrawer() {
-        if (!sidebarExpanded) return
-        sidebarExpanded = false
-        binding.drawerScrim.animate().alpha(0f).setDuration(200).withEndAction {
-            binding.drawerScrim.visibility = View.GONE
-        }.start()
-        binding.librarySidebar.animate().translationX(-dp(200).toFloat()).setDuration(250).start()
-        val lp = binding.homeContent.layoutParams as android.widget.FrameLayout.LayoutParams
-        lp.marginStart = 0
-        binding.homeContent.layoutParams = lp
-        // 抽屉收起后恢复顶部栏
-        activity?.findViewById<View>(R.id.topNavBar)?.visibility = View.VISIBLE
-        binding.mediaSourceList.post { binding.mediaSourceList.requestFocus() }
+    /** 焦点回内容区（MainActivity 调用） */
+    fun closeDrawerFromActivity() {
+        focusContent()
     }
 
     /** 填充左侧媒体库栏（固定入口 + Emby 媒体库） */

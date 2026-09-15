@@ -75,6 +75,16 @@
    - **⑥ 继续观看往下按焦点消失**——根本原因:DpadRecyclerView 1.5.0-beta01 必须 `setSelectedPosition(0)` 才会把焦点委托给 item,否则按方向键焦点可能丢失。修复=VideoTypeRecyclerAdapterDiff.onBindViewHolder 中调用 `rh.videoList.setSelectedPosition(0)`
    - 🔴 根因总结：本轮修复发现 ⑤ 才是系列问题的**核心**,顶部栏塌陷导致整个焦点系统崩溃(①/④ 都被它牵连);只有从根上修约束/层级,焦点系统才能正常工作
 
+**21. ✅ 按完整设计文档重构（v0.9.0，2026-09-15）**：
+   - **文档来源**：用户提供完整设计文档 https://4m26jt88ke3b2.aiforce.cloud/app/app_17e5z16d4rc（v1.0），已全文存档 `docs/design-doc-full.md`（色彩/字体/间距/图标/9页界面详解/交互规范/焦点态/动画全收录）
+   - **用户拍板：左侧导航改为常驻 18%，不再弹出**（原为抽屉式 200dp 隐藏/弹出）
+   - **重构内容**：
+     - fragment_emby.xml 重写：根改 ConstraintLayout；`librarySidebar` 常驻 `layout_constraintWidth_percent="0.18"`；`homeContent` 占 82%（`layout_constraintWidth_percent="0.82"` + Start_toEndOf sidebar）；删 drawerScrim/translationX 抽屉动画；Hero 边距按文档改 20dp(40px)
+     - activity_main.xml：新增 `sidebarAnchor`(18% 宽占位)约束 topNavBar 只覆盖右侧 82% 内容区
+     - EmbyFragment.kt：删 openDrawer/closeDrawer/sidebarExpanded 抽屉逻辑；新增 `focusSidebar()`(焦点移入导航栏首项)/`focusContent()`(焦点回内容区)/`isFocusInSidebar()`;`onGlobalLeftKey` 改为"内容区最左元素(行标题/最左海报)按左 → 焦点移入导航栏";导航栏内按右/返回 → 回内容区
+     - MainActivity.kt：返回键/方向键逻辑从"抽屉开关"改为"导航栏焦点进出"
+   - 与设计文档其余差异（未完成，见待办）：页面边距 40px、横向列表间距 24px、海报卡圆角 16px、背景色 #0A0A0A、金色 #F5C542、Banner 5s、媒体库 4×3 横版网格、搜索页/媒体库页左侧导航
+
 - ⚠️ 遗留：用户反馈"下移再上移回到最初位置" 待复现验证
 
 ## 三、待办（下一步）
