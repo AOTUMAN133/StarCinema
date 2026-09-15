@@ -49,7 +49,27 @@ class MainActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.nav_home).setOnClickListener { viewPager.setCurrentItem(0, true) }
         findViewById<android.view.View>(R.id.nav_search).setOnClickListener { openSearch() }
         findViewById<android.view.View>(R.id.nav_settings).setOnClickListener { openSettings() }
-        // 星光影院：☰ 菜单按钮 → 打开导航抽屉
+        // 🔴 顶部导航聚焦视觉反馈：聚焦时图标/文字变金色（无反馈=用户以为"无法聚焦"）
+        fun navFocusListener(goldViews: List<Int>, grayViews: List<Int>) =
+            android.view.View.OnFocusChangeListener { v, hasFocus ->
+                val gold = v.context.getColor(R.color.star_gold)
+                val gray = v.context.getColor(R.color.star_text_secondary)
+                goldViews.forEach { id -> findViewById<android.widget.ImageView>(id)?.setColorFilter(if (hasFocus) gold else gray, android.graphics.PorterDuff.Mode.SRC_ATOP) }
+                v.post {
+                    if (v !is android.view.ViewGroup) return@post
+                    for (i in 0 until v.childCount) {
+                        val child = v.getChildAt(i)
+                        if (child is android.widget.TextView) child.setTextColor(if (hasFocus) gold else gray)
+                    }
+                }
+            }
+        findViewById<android.view.View>(R.id.nav_home).setOnFocusChangeListener(
+            navFocusListener(listOf(R.id.nav_home_icon), listOf(R.id.nav_search_icon, R.id.nav_settings_icon)))
+        findViewById<android.view.View>(R.id.nav_search).setOnFocusChangeListener(
+            navFocusListener(listOf(R.id.nav_search_icon), listOf(R.id.nav_home_icon, R.id.nav_settings_icon)))
+        findViewById<android.view.View>(R.id.nav_settings).setOnFocusChangeListener(
+            navFocusListener(listOf(R.id.nav_settings_icon), listOf(R.id.nav_home_icon, R.id.nav_search_icon)))
+        // ☰ 菜单按钮 → 打开导航抽屉
         findViewById<android.view.View>(R.id.nav_menu_btn).setOnClickListener {
             val homeFrag = pageAdapter.pages.getOrNull(0)
             if (homeFrag is EmbyFragment && homeFrag.isResumed) homeFrag.onGlobalLeftKey(force = true)
@@ -123,13 +143,12 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
+                // 🔴 DPadRecyclerView 已消费 → return false 走默认（避免 MainActivity 重复处理）
                 when (event.keyCode) {
-                    android.view.KeyEvent.KEYCODE_DPAD_LEFT -> {
+                    android.view.KeyEvent.KEYCODE_DPAD_LEFT ->
                         if (frag.onGlobalLeftKey()) return true
-                    }
-                    android.view.KeyEvent.KEYCODE_DPAD_UP -> {
+                    android.view.KeyEvent.KEYCODE_DPAD_UP ->
                         if (frag.onGlobalUpKey()) return true
-                    }
                 }
             }
         }

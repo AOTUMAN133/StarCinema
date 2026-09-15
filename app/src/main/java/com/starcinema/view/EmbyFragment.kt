@@ -128,17 +128,12 @@ class EmbyFragment : Fragment() {
         adapter = VideoTypeRecyclerAdapterDiff()
         binding.mediaSourceList.adapter = adapter
 
-        // 星光影院：初始化左侧媒体库栏
+        // 初始化左侧媒体库栏
         setupSidebar()
 
-        // 左键开抽屉 / 上键聚焦 Hero 统一由 MainActivity.dispatchKeyEvent 按焦点位置拦截
-        // （DpadRecyclerView 会消费方向键，根布局监听收不到，且会误开抽屉）
+        // 🔴 焦点链由 buildRows() 统一管理（依赖 heroItems 是否非空），不在此处重复设置
         binding.root.setOnKeyListener(null)
         binding.mediaSourceList.setOnKeyListener(null)
-
-        // 顶部栏焦点链：首页列表向上 → 顶部导航"首页"；导航向下 → 首页
-        binding.mediaSourceList.nextFocusUpId = R.id.nav_home
-        activity?.findViewById<View>(R.id.nav_home)?.nextFocusDownId = R.id.mediaSourceList
     }
 
     /** 星光影院：左侧媒体库栏（可滚动，可收缩） */
@@ -236,7 +231,7 @@ class EmbyFragment : Fragment() {
         return true
     }
 
-    /** 焦点是否在内容区最左边（行标题 typeText / 第一张海报 / videoList 本体） */
+    /** 焦点是否在内容区最左边（仅当焦点是"海报 item 且是该行可视最左一张"时返回 true） */
     private fun isFocusAtLeftEdge(): Boolean {
         val f = requireActivity().currentFocus ?: return false
         var videoList: com.rubensousa.dpadrecyclerview.DpadRecyclerView? = null
@@ -245,12 +240,13 @@ class EmbyFragment : Fragment() {
         while (cur != null && cur.parent !== binding.mediaSourceList) {
             if (cur is com.rubensousa.dpadrecyclerview.DpadRecyclerView) videoList = cur
             if (videoList != null && itemView == null && cur.parent === videoList) itemView = cur
-            if (cur.id == R.id.typeText) return true  // 行标题 → 最左边
+            // 🔴 行标题/更多 按左一律不开抽屉（用户要求：只有海报最左才弹）
+            if (cur.id == R.id.typeText || cur.id == R.id.moreText) return false
             cur = cur.parent as? android.view.View
         }
-        if (videoList == null) return false  // 非行内控件（moreText/导航等）→ 不开抽屉
-        // 第一张海报（或 videoList 本体）→ 最左边
-        return itemView == null || videoList.getChildAdapterPosition(itemView) <= 0
+        if (videoList == null || itemView == null) return false  // 非行内海报 → 不开抽屉
+        // 🔴 判断"该海报是可视区域最左一张"：其 left ≤ paddingStart（左边无其他可见海报）
+        return itemView.left <= videoList.paddingStart + 1  // +1 容许亚像素
     }
 
     /** 抽屉是否打开（MainActivity 返回键判断） */
@@ -357,9 +353,11 @@ class EmbyFragment : Fragment() {
 
         // 星光影院：Hero 独立海报（加载到 heroBackground 圆角卡，交叉淡化）
         // Hero 是宽幅卡 → 必须用横版 Backdrop(16:9)，竖版 Primary 会被 centerCrop 掐头去尾
+        // Emby 协议：backdropImageTags 是独立 List<String> 字段（不是 imageTags map），优先级最高
         val bgItemId = if (item.type == "Episode" && !item.seriesId.isNullOrBlank()) item.seriesId else item.id
-        val backdropTag = item.imageTags?.get("Backdrop") ?: item.imageTags?.get("Thumb")
+        val backdropTag = item.backdropImageTags?.firstOrNull()
         val bgUrl = client.getBackdropUrl(baseUrl, bgItemId, backdropTag, apiKey, 1200)
+            ?: client.getImageUrl(baseUrl, bgItemId, item.imageTags?.get("Thumb"), apiKey, 1200, "Thumb")
             ?: client.getImageUrl(baseUrl, bgItemId, item.imageTags?.get("Primary"), apiKey, 1200)
         if (bgUrl != null) {
             // 底层：小图拉伸天然模糊铺满（填满超宽 Hero 卡，避免裸黑边）

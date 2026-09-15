@@ -66,13 +66,16 @@
    - ⏳ **P3-⑧⑨ 剧集/演员作品/搜索/设置页真机验证**：代码完整，需真服务器数据（用户在自己服务器上验收）
    - **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
-**18. ✅ 首页五问题第二轮修复（v0.7.1，2026-09-15，用户盒子实测反馈）**：
-   - **① Hero 海报仍不好看（画面切割）**：Hero 卡是超宽横幅(≈4.9:1)，16:9 剧照 centerCrop 必被切上下。修复=双层结构：底层小图拉伸天然模糊铺满 + 上层完整剧照 fitCenter 居中（不切割，TV 通用 Hero 方案；fragment_emby.xml 新增 heroBackgroundBlur + EmbyImageLoader.loadSmall）
-   - **② 热门推荐/继续观看与 Hero 左右不对齐**：修复=统一边距为 24dp（item_movie_type_recycler.xml：行标题 marginStart 24dp / moreText marginEnd 24dp / videoList paddingStart+End 24dp，与 Hero marginStart/End 24dp 对齐）
-   - **③ 顶部导航首页/搜索/设置仍无法聚焦**：修复=Hero 上键显式路由到 nav_home（bannerArea.setKeyListener 拦截 UP 直接 requestFocus 导航，不再依赖 nextFocusUpId 防容器拦截）
-   - **④ 抽屉媒体库点击仍无反应**：修复=tryFocusSidebarItem 循环重试聚焦 item0（最多 12 次×100ms，适配 adapter 晚于抽屉动画填充的时序；避免焦点落在 RecyclerView 本体导致 DPAD_CENTER Unhandled）
-   - **⑤ "更多"紧贴标题**：根因=行标题父 LinearLayout 是 wrap_content，weight=1 的 typeText 撑不开。修复=父容器改 match_parent，"更多 >" 推到行尾
-   - ⚠️ 遗留确认项："下移后再上移无法回到最初位置"（DpadRecyclerView 行切换位置保持），待复现验证
+**19. ✅ 首页六问题深度修复（v0.8.0，2026-09-15，用户盒子实测反馈 + 深度分析）**：
+   - **① Hero 仍是剧照（非宽幅背景图）——根本原因**：Emby 协议里 backdrop 的 tag 在 `backdropImageTags: List<String>` 独立字段（不是 `imageTags` map），之前所有修复都在错的字段上找。修复=`item.backdropImageTags?.firstOrNull()` 作 tag 调 getBackdropUrl（EmbyFragment.kt showHero）
+   - **② 顶部导航/更多 仍无法聚焦——根本原因**：导航项 focusable=true，但**没有任何聚焦视觉反馈**，文字/图标始终灰色，用户看不到焦点。修复=MainActivity 添加三个导航项的 onFocusChangeListener：聚焦时图标/文字变金色（star_gold）
+   - **③ 抽屉媒体库点击仍无反应——根本原因**：onClick 用 `bindingAdapterPosition` 在 RecyclerView 动画/ItemDecoration 状态下可能返回 `NO_POSITION=-1`。修复=SidebarAdapter.onBindViewHolder 中捕获 item 本身,安全 fallback
+   - **④ 下移再上移 Hero 与内容行间距消失——根本原因**：fragment_emby 根布局 `animateLayoutChanges="true"` + `homeContent` 加 `nextFocusUp=@id/mediaSourceList` 的焦点 hack,触发 ConstraintLayout 在滚动时重计算 margin。修复=去除 animateLayoutChanges、去除所有焦点 hack 属性;RecyclerView 加固定 paddingTop=16dp 保证上下滚动后间距不变
+   - **⑤ 热门推荐不在 Hero 宽度内——根本原因**：item_poster_card 自带 marginEnd=10dp 与 RecyclerView itemSpacing=10dp 重复计算,首张被推出 20dp。修复=item marginEnd=0,由 RecyclerView itemSpacing 统一管理;paddingStart/End=24 与 Hero 对齐
+   - **⑥ 抽屉"按左就弹"——根本原因**：isFocusAtLeftEdge 用 `adapter position ≤ 0` 判断,position0 的 item 任何时候按左都触发。修复=判断 `itemView.left ≤ videoList.paddingStart`(屏幕可视最左);用户焦点在行标题/更多 时按左不再弹抽屉
+   - 🔴 根因总结：6 个问题里前 5 个都涉及字段名/视觉反馈缺失/RecyclerView 边界判断错误——**之前表面修复都绕过了根本**
+
+- ⚠️ 遗留：用户反馈"下移再上移回到最初位置" 待复现验证
 
 ## 三、待办（下一步）
 

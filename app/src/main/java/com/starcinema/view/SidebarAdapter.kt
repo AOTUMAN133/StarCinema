@@ -100,7 +100,10 @@ class SidebarAdapter(
             holder.ray?.visibility = if (hasFocus) View.VISIBLE else View.GONE
         }
         holder.itemView.setOnClickListener {
-            onClick(getItem(holder.bindingAdapterPosition))
+            // 🔴 必须捕获 item 本身，不能用 bindingAdapterPosition（动画/ItemDecoration 状态下可能返回 NO_POSITION=-1）
+            val pos = holder.bindingAdapterPosition
+            val safeItem = if (pos != RecyclerView.NO_POSITION) getItem(pos) else item
+            onClick(safeItem)
         }
     }
 }
