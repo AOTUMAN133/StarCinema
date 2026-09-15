@@ -207,11 +207,23 @@ class EmbyFragment : Fragment() {
         binding.homeContent.layoutParams = lp
         // 抽屉打开时隐藏顶部栏（避免 Logo 与抽屉重叠）
         activity?.findViewById<View>(R.id.topNavBar)?.visibility = View.GONE
-        // 🔴 焦点必须落到具体 item 而非 RecyclerView 本体，否则 DPAD_CENTER 不被消费 → 点击无反应
+        // 🔴 焦点必须落到具体 item 而非 RecyclerView 本体，否则 DPAD_CENTER 不被消费 → 点击无反应。
+        //    循环重试：adapter 数据可能晚于抽屉动画填充（fillSidebar 在 loadHomeData 后），
+        //    一旦 item0 可用立即聚焦，最多重试 1.2s
         binding.libraryList.postDelayed({
-            binding.libraryList.findViewHolderForAdapterPosition(0)?.itemView?.requestFocus()
-                ?: binding.libraryList.requestFocus()
-        }, 260)
+            if (!isAdded || _binding == null) return@postDelayed
+            tryFocusSidebarItem(0, 12)
+        }, 160)
+    }
+
+    private fun tryFocusSidebarItem(position: Int, attemptsLeft: Int) {
+        if (!isAdded || _binding == null || attemptsLeft <= 0 || sidebarExpanded.not()) return
+        val vh = binding.libraryList.findViewHolderForAdapterPosition(position)
+        if (vh != null) {
+            vh.itemView.requestFocus()
+        } else {
+            binding.libraryList.postDelayed({ tryFocusSidebarItem(position, attemptsLeft - 1) }, 100)
+        }
     }
 
     /** 星光影院：全局左键兜底（MainActivity dispatchKeyEvent 调用），返回 true=已开抽屉。
@@ -350,6 +362,12 @@ class EmbyFragment : Fragment() {
         val bgUrl = client.getBackdropUrl(baseUrl, bgItemId, backdropTag, apiKey, 1200)
             ?: client.getImageUrl(baseUrl, bgItemId, item.imageTags?.get("Primary"), apiKey, 1200)
         if (bgUrl != null) {
+            // 底层：小图拉伸天然模糊铺满（填满超宽 Hero 卡，避免裸黑边）
+            binding.heroBackgroundBlur.animate().alpha(0f).setDuration(150).withEndAction {
+                EmbyImageLoader.loadSmall(binding.heroBackgroundBlur, bgUrl)
+                binding.heroBackgroundBlur.animate().alpha(1f).setDuration(300).start()
+            }.start()
+            // 上层：完整剧照 fitCenter 居中（不切割，16:9 原图完整显示）
             binding.heroBackground.animate().alpha(0f).setDuration(150).withEndAction {
                 EmbyImageLoader.load(binding.heroBackground, bgUrl)
                 binding.heroBackground.animate().alpha(1f).setDuration(300).start()
@@ -476,6 +494,10 @@ class EmbyFragment : Fragment() {
             when (keyCode) {
                 android.view.KeyEvent.KEYCODE_DPAD_LEFT -> { flipHero(-1); true }
                 android.view.KeyEvent.KEYCODE_DPAD_RIGHT -> { flipHero(1); true }
+                // 🔴 Hero 上键显式跳顶部导航（不依赖 nextFocusUpId，防容器拦截）
+                android.view.KeyEvent.KEYCODE_DPAD_UP -> {
+                    activity?.findViewById<View>(R.id.nav_home)?.requestFocus() ?: false
+                }
                 android.view.KeyEvent.KEYCODE_DPAD_CENTER, android.view.KeyEvent.KEYCODE_ENTER,
                 android.view.KeyEvent.KEYCODE_NUMPAD_ENTER -> {
                     heroItems.getOrNull(heroIndex)?.let { openDetail(it) }

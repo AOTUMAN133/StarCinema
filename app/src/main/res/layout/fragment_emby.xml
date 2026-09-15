@@ -52,13 +52,22 @@
 
                 <!-- Hero 背景图（全宽横幅，圆角裁切在卡内） -->
                 <ImageView
-                    android:id="@+id/heroBackground"
+                    android:id="@+id/heroBackgroundBlur"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:clipToOutline="true"
                     android:outlineProvider="background"
                     android:background="@drawable/bg_hero_card" />
+
+                <!-- Hero 完整剧照（fitCenter 不切割，16:9 原图居中显示） -->
+                <ImageView
+                    android:id="@+id/heroBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background" />
 
                 <!-- 底部渐变遮罩（文字可读） -->
                 <View

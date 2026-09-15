@@ -66,13 +66,13 @@
    - ⏳ **P3-⑧⑨ 剧集/演员作品/搜索/设置页真机验证**：代码完整，需真服务器数据（用户在自己服务器上验收）
    - **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
-**17. ✅ 首页四问题修复（v0.7.0，2026-09-15，用户盒子实测反馈）**：
-   - **① Hero 海报掐头去尾**：根因=电影/剧集走 `getImageUrl` 默认取 Primary 竖版图，塞进横版 Hero centerCrop。修复=统一优先 Backdrop(16:9) 横版剧照，Primary 仅 fallback（EmbyFragment.kt showHero）
-   - **② 继续观看行不对**：用户明确"看到的是竖版很丑"。根因=旧版 item_poster_landscape 是"左侧方形封面+右文字信息卡"，封面是竖版 Primary centerCrop 进方形。修复=整体重写为**整张 16:9 横版海报 + 底部渐变叠标题/进度/百分比**（item_poster_landscape.xml 重写 288x162dp）+ landscape 行取图改 Thumb/Backdrop 横版
-   - **③ 导航栏媒体库点击无反应**：根因=openDrawer 里 `libraryList.requestFocus()` 焦点落在 RecyclerView 本体而非具体 item，DPAD_CENTER 不被消费 → Unhandled。修复=焦点落到第一个 itemView
-   - **④ 顶部导航首页/搜索/设置聚焦不到**：根因=焦点链只在 heroItems 非空时设置；heroItems 空时 onGlobalUpKey 直接 return false 断链。修复=焦点链无条件设置（有 Hero：内容行→Hero→导航；无 Hero：内容行→导航直达）+ onGlobalUpKey 空 Hero 直达导航
-   - ⚠️ 遗留确认项：用户盒子实测反馈"下移后再上移无法回到最初位置"（DpadRecyclerView 行切换位置保持），待复现验证
-   - 账号密码登录（v0.6.1 定稿）保持不变
+**18. ✅ 首页五问题第二轮修复（v0.7.1，2026-09-15，用户盒子实测反馈）**：
+   - **① Hero 海报仍不好看（画面切割）**：Hero 卡是超宽横幅(≈4.9:1)，16:9 剧照 centerCrop 必被切上下。修复=双层结构：底层小图拉伸天然模糊铺满 + 上层完整剧照 fitCenter 居中（不切割，TV 通用 Hero 方案；fragment_emby.xml 新增 heroBackgroundBlur + EmbyImageLoader.loadSmall）
+   - **② 热门推荐/继续观看与 Hero 左右不对齐**：修复=统一边距为 24dp（item_movie_type_recycler.xml：行标题 marginStart 24dp / moreText marginEnd 24dp / videoList paddingStart+End 24dp，与 Hero marginStart/End 24dp 对齐）
+   - **③ 顶部导航首页/搜索/设置仍无法聚焦**：修复=Hero 上键显式路由到 nav_home（bannerArea.setKeyListener 拦截 UP 直接 requestFocus 导航，不再依赖 nextFocusUpId 防容器拦截）
+   - **④ 抽屉媒体库点击仍无反应**：修复=tryFocusSidebarItem 循环重试聚焦 item0（最多 12 次×100ms，适配 adapter 晚于抽屉动画填充的时序；避免焦点落在 RecyclerView 本体导致 DPAD_CENTER Unhandled）
+   - **⑤ "更多"紧贴标题**：根因=行标题父 LinearLayout 是 wrap_content，weight=1 的 typeText 撑不开。修复=父容器改 match_parent，"更多 >" 推到行尾
+   - ⚠️ 遗留确认项："下移后再上移无法回到最初位置"（DpadRecyclerView 行切换位置保持），待复现验证
 
 ## 三、待办（下一步）
 
