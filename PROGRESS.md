@@ -54,7 +54,7 @@
    - **详情页跳转问题已解决**：之前 tap (256,395) 落到的是首页 Hero 上的"立即播放"按钮（设计稿不应有！见差异 H1），实际详情页按钮坐标 (92,441)-(236,485) 中心 (164,463)。tap 后正确进入 PlayerActivity（logcat `Displayed com.starcinema/.view.PlayerActivity`）
    - **设计稿 vs 实装差异核对**：docs/design-vs-implementation.md（9 大项 31 子项，P1 必做 2 项 / P2 应做 5 项 / P3 打磨 4 项）
    - **D1 抽屉结构决策撤销**：固定 9 项 → 保留动态 Emby 库列表（不同服务器库数差异大）
-   - **LG1 临时自动连接移除 + 隐私数据清理**：EmbyFragment 内 hardcode `http://192.168.1.33:28096 533/123321 馋死你` 已全部删除，无服务器时引导用户到 ServerListFragment 添加服务器；**所有连接信息由用户运行时输入，源码零硬编码隐私数据**。小米盒子真机验证通过：空状态显示"我的服务器"+"添加服务器"大黄色卡片（对齐 design-server-login.md）
+   - **LG1 临时自动连接移除 + 隐私数据清理**：EmbyFragment 内 hardcode 的测试服务器地址/账号/密码已全部删除，无服务器时引导用户到 ServerListFragment 添加服务器；**所有连接信息由用户运行时输入，源码零硬编码隐私数据**。小米盒子真机验证通过：空状态显示"我的服务器"+"添加服务器"大黄色卡片（对齐 design-server-login.md）
    - **小技巧**：调试时用 `uiautomator dump` 取真实坐标；盒子屏保 `pm disable-user com.xiaomi.mitv.hyper.screensaver` + `pm disable-user com.mitv.tvhome` 防止抢前台
 
 **14. ✅ M6 打磨完成（v0.6.0，2026-09-15）**：
@@ -66,13 +66,13 @@
    - ⏳ **P3-⑧⑨ 剧集/演员作品/搜索/设置页真机验证**：代码完整，需真服务器数据（用户在自己服务器上验收）
    - **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
-**16. ✅ 登录方式定稿（v0.6.1，2026-09-15）**：
-   - **用户明确要求：Emby 登录只用账号密码，不用 API Key 访问**
-   - 移除 ServerEditFragment 的 API Key 登录模式（切换按钮/apiKeyInput/apiKeyLabel 全部删除），恢复纯 `authenticateByPassword`
-   - EmbyClient 的 getResumeItems/getLatestItems 恢复原样（不再有 userId 为空降级分支）
-   - ⚠️ **教训**：曾为排查服务器 401 临时加了 API Key 登录，用户明确否决 → 已全量回滚。登录方式以用户要求为准
-   - **盒子事故教训（重要）**：曾 `pm disable-user com.mitv.tvhome` + `com.xiaomi.mitv.hyper.screensaver` 防屏保，导致盒子黑屏无法使用，用户重置盒子。**绝不对盒子系统组件做 disable-user 操作**；防屏保用 `svc power stayon true` 或缩短验证间隔即可
-   - 编译通过（debug 双 ABI）
+**17. ✅ 首页四问题修复（v0.7.0，2026-09-15，用户盒子实测反馈）**：
+   - **① Hero 海报掐头去尾**：根因=电影/剧集走 `getImageUrl` 默认取 Primary 竖版图，塞进横版 Hero centerCrop。修复=统一优先 Backdrop(16:9) 横版剧照，Primary 仅 fallback（EmbyFragment.kt showHero）
+   - **② 继续观看行不对**：用户明确"看到的是竖版很丑"。根因=旧版 item_poster_landscape 是"左侧方形封面+右文字信息卡"，封面是竖版 Primary centerCrop 进方形。修复=整体重写为**整张 16:9 横版海报 + 底部渐变叠标题/进度/百分比**（item_poster_landscape.xml 重写 288x162dp）+ landscape 行取图改 Thumb/Backdrop 横版
+   - **③ 导航栏媒体库点击无反应**：根因=openDrawer 里 `libraryList.requestFocus()` 焦点落在 RecyclerView 本体而非具体 item，DPAD_CENTER 不被消费 → Unhandled。修复=焦点落到第一个 itemView
+   - **④ 顶部导航首页/搜索/设置聚焦不到**：根因=焦点链只在 heroItems 非空时设置；heroItems 空时 onGlobalUpKey 直接 return false 断链。修复=焦点链无条件设置（有 Hero：内容行→Hero→导航；无 Hero：内容行→导航直达）+ onGlobalUpKey 空 Hero 直达导航
+   - ⚠️ 遗留确认项：用户盒子实测反馈"下移后再上移无法回到最初位置"（DpadRecyclerView 行切换位置保持），待复现验证
+   - 账号密码登录（v0.6.1 定稿）保持不变
 
 ## 三、待办（下一步）
 
@@ -81,13 +81,13 @@
 
 ## 四、关键技术备忘（来自旧项目调试）
 
-- **隐私守则（用户明确要求）**：服务器地址、账号、密码、API Key、access token、user id 等**绝不出现在源码/文档/PROGRESS 中**。所有连接信息由用户运行时通过 SharedPreferences 输入。源码扫描命令：`grep -rEn '192\.168\.1\.|28096|48096|d916bdc|d916bdc17e6e4443ab72a9441a7a249b|test_token|test-key' app/src/main/java app/src/main/res/values`
+- **隐私守则（用户明确要求）**：服务器地址、账号、密码、API Key、access token、user id 等**绝不出现在源码/文档/PROGRESS 中**。所有连接信息由用户运行时通过 SharedPreferences 输入。源码扫描命令：`grep -rEn '192\.168\.1\.|28096|48096|test_token|test-key' app/src/main/java app/src/main/res/values`
 - **安装包**：release 签名才能覆盖盒子现有包（debug 包 INSTALL_FAILED_UPDATE_INCOMPATIBLE）
 - **构建输出**：APK 名带 ABI 后缀 app-armeabi-v7a-release.apk（之前一直装错 app-debug.apk 导致测旧代码）
 - **R8**：release 开启会剥 Log；调试临时 isMinifyEnabled=false
 - **盒子**：小米盒子屏保 20s 抢前台（svc power stayon 无效）；ADB 验证要快速连续操作；屏保可 pm disable-user com.xiaomi.mitv.hyper.screensaver
 - **Hero 手动切**：MainActivity.dispatchKeyEvent 全局路由左右键给 Hero（焦点不在行内时），flipHero 后 post requestFocus 保持焦点
-- **服务器**：盒子测试服务器 192.168.1.33:28096，账号 533/123321（服务名"馋死你"）；开发 48096 api_key=d916bdc17e6e4443ab72a9441a7a249b
+- **服务器**：测试服务器在盒子实测时由用户在登录页输入（隐私不入文档）；开发服务器用 api_key 方式访问（详见本地调试记录，不落文档）
 - **MPV AAR 自带 40 个 .so**（arm64+v7a 的 libmpv/libav*/libc++_shared），jniLibs 目录勿重复添加
 - **A 组摘除依赖**：PreferencesHelper 原文件含 WebDAV/SMB/AList 配置段（引 C 组类），M1 已裁剪；EmbyClient 仅依赖 gson/okhttp，无内部类依赖
 

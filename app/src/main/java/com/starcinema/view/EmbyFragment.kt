@@ -207,7 +207,11 @@ class EmbyFragment : Fragment() {
         binding.homeContent.layoutParams = lp
         // 抽屉打开时隐藏顶部栏（避免 Logo 与抽屉重叠）
         activity?.findViewById<View>(R.id.topNavBar)?.visibility = View.GONE
-        binding.libraryList.postDelayed({ binding.libraryList.requestFocus() }, 260)
+        // 🔴 焦点必须落到具体 item 而非 RecyclerView 本体，否则 DPAD_CENTER 不被消费 → 点击无反应
+        binding.libraryList.postDelayed({
+            binding.libraryList.findViewHolderForAdapterPosition(0)?.itemView?.requestFocus()
+                ?: binding.libraryList.requestFocus()
+        }, 260)
     }
 
     /** 星光影院：全局左键兜底（MainActivity dispatchKeyEvent 调用），返回 true=已开抽屉。
@@ -340,13 +344,11 @@ class EmbyFragment : Fragment() {
         binding.bannerOverview.text = item.overview ?: ""
 
         // 星光影院：Hero 独立海报（加载到 heroBackground 圆角卡，交叉淡化）
+        // Hero 是宽幅卡 → 必须用横版 Backdrop(16:9)，竖版 Primary 会被 centerCrop 掐头去尾
         val bgItemId = if (item.type == "Episode" && !item.seriesId.isNullOrBlank()) item.seriesId else item.id
-        val fanartTag = item.imageTags?.get("Thumb") ?: item.imageTags?.get("Backdrop") ?: item.imageTags?.get("Primary")
-        val bgUrl = if (bgItemId == item.id) {
-            client.getImageUrl(baseUrl, bgItemId, fanartTag, apiKey, 1200)
-        } else {
-            client.getBackdropUrl(baseUrl, bgItemId, null, apiKey, 1200)
-        }
+        val backdropTag = item.imageTags?.get("Backdrop") ?: item.imageTags?.get("Thumb")
+        val bgUrl = client.getBackdropUrl(baseUrl, bgItemId, backdropTag, apiKey, 1200)
+            ?: client.getImageUrl(baseUrl, bgItemId, item.imageTags?.get("Primary"), apiKey, 1200)
         if (bgUrl != null) {
             binding.heroBackground.animate().alpha(0f).setDuration(150).withEndAction {
                 EmbyImageLoader.load(binding.heroBackground, bgUrl)
@@ -413,7 +415,7 @@ class EmbyFragment : Fragment() {
 
     /** 全局上键（MainActivity dispatchKeyEvent 调用）：焦点在第一行且 Hero 有内容 → 聚焦 Hero；返回 true=已处理 */
     fun onGlobalUpKey(): Boolean {
-        if (heroItems.isEmpty() || !isAdded || _binding == null || isHeroBannerFocused()) return false
+        if (!isAdded || _binding == null || isHeroBannerFocused()) return false
         val f = requireActivity().currentFocus ?: return false
         if (!isFocusInsideRows()) return false
         // 焦点所在行必须是第一行（第二行上键留给 DpadRecyclerView 自己回第一行）
@@ -426,7 +428,12 @@ class EmbyFragment : Fragment() {
         } else if (f !== binding.mediaSourceList) {
             return false
         }
-        binding.bannerArea.requestFocus()
+        // 有 Hero → 聚焦 Hero；无 Hero → 直达顶部导航
+        if (heroItems.isNotEmpty()) {
+            binding.bannerArea.requestFocus()
+        } else {
+            activity?.findViewById<View>(R.id.nav_home)?.requestFocus()
+        }
         return true
     }
 
@@ -594,6 +601,7 @@ class EmbyFragment : Fragment() {
         latest.forEach { (_, items) -> if (items.isNotEmpty()) heroItems.add(items.first()) }
         resumeItems.take(4).forEach { if (heroItems.size < 8 && heroItems.none { h -> h.id == it.id }) heroItems.add(it) }
         heroItems.shuffle()
+        // 🔴 焦点链无条件设置（heroItems 空时内容行直达顶部导航，避免上键断链无法聚焦）
         if (heroItems.isNotEmpty()) {
             heroHandler.removeCallbacks(heroAutoPlay)
             showHero(0)
@@ -607,10 +615,14 @@ class EmbyFragment : Fragment() {
             activity?.findViewById<View>(R.id.nav_home)?.nextFocusDownId = R.id.bannerArea
             activity?.findViewById<View>(R.id.nav_search)?.nextFocusDownId = R.id.bannerArea
             activity?.findViewById<View>(R.id.nav_settings)?.nextFocusDownId = R.id.bannerArea
-            // Hero 默认拿焦点：进首页直接可上下键跳到顶部/内容行；
-            // 左/右键已通过 MainActivity 全局路由给 Hero（焦点不在行内时），所以这里不强抢，
-            // 让用户用上键进 Hero 也行，默认焦点在 mediaSourceList 保持行的可达性
+        } else {
+            // 无 Hero：内容行上键直达顶部导航，导航下键回内容行
+            binding.mediaSourceList.nextFocusUpId = R.id.nav_home
+            activity?.findViewById<View>(R.id.nav_home)?.nextFocusDownId = R.id.mediaSourceList
+            activity?.findViewById<View>(R.id.nav_search)?.nextFocusDownId = R.id.mediaSourceList
+            activity?.findViewById<View>(R.id.nav_settings)?.nextFocusDownId = R.id.mediaSourceList
         }
+        // 首页加载完成后聚焦第一个可聚焦项
 
         val rows = mutableListOf<VideoType>()
 

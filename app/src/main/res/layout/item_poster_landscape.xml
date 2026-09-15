@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 星光影院：继续观看横版信息卡（左侧方形封面 + 右侧标题/进度文字/金色进度条/百分比） -->
+<!-- 星光影院：继续观看横版卡（设计稿定稿：整张 16:9 海报 + 底部渐变叠标题/进度/百分比） -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/imageBox"
-    android:layout_width="400dp"
-    android:layout_height="112dp"
-    android:layout_marginEnd="12dp"
+    android:layout_width="288dp"
+    android:layout_height="162dp"
     android:focusable="true"
     android:clickable="true"
     android:clipChildren="false"
@@ -15,43 +14,33 @@
     app:strokeColor="#00FFFFFF"
     app:strokeWidth="2dp">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:clipChildren="false">
+        android:clipToOutline="true">
 
-        <!-- 左侧方形封面 -->
-        <FrameLayout
-            android:id="@+id/posterBox"
-            android:layout_width="112dp"
+        <!-- 整张横版海报（Thumb/Backdrop 16:9） -->
+        <ImageView
+            android:id="@+id/posterImage"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToOutline="true">
+            android:scaleType="centerCrop" />
 
-            <ImageView
-                android:id="@+id/posterImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop" />
+        <!-- 底部渐暗遮罩（保证标题/进度可读） -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_card_bottom_gradient" />
 
-            <!-- 星光影院：金色进度条（底部叠在封面上） -->
-            <View
-                android:id="@+id/progressBar"
-                android:layout_width="0dp"
-                android:layout_height="5dp"
-                android:layout_gravity="bottom|start"
-                android:background="@color/star_gold" />
-        </FrameLayout>
-
-        <!-- 右侧信息区 -->
+        <!-- 底部信息区：标题 + 进度条 + 百分比 -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="12dp">
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="12dp">
 
             <TextView
                 android:id="@+id/titleText"
@@ -60,25 +49,25 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/subtitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/star_text_secondary"
-                android:textSize="12sp" />
+                android:textColor="#B3FFFFFF"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="8dp"
                 android:weightSum="100">
 
                 <View
@@ -100,10 +89,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:textColor="@color/star_text_secondary"
-                    android:textSize="12sp" />
+                    android:textColor="#E6E8B64C"
+                    android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+
+    </FrameLayout>
 
 </com.google.android.material.card.MaterialCardView>

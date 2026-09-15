@@ -51,10 +51,15 @@ class HorizontalItemAdapter(
 ) : RecyclerView.Adapter<HorizontalItemAdapter.ViewHolder>() {
 
     private val imageUrls = items.map { item ->
-        // 剧集显示剧集海报（seriesId 的 Primary），而非单集缩略图
+        // 剧集显示剧集海报（seriesId），而非单集缩略图
         val imageId = if (item.type == "Episode" && !item.seriesId.isNullOrBlank()) item.seriesId else item.id
         val tag = if (imageId == item.id) (item.imageTags?.get("Primary") ?: item.primaryImageTag) else null
-        if (tag != null) client.getImageUrl(baseUrl, imageId, tag, apiKey, 480)
+        if (landscape) {
+            // 继续观看横版卡：优先 Thumb/Backdrop 横版剧照，避免竖版海报掐头去尾
+            val fanartTag = item.imageTags?.get("Thumb") ?: item.imageTags?.get("Backdrop")
+            if (fanartTag != null) client.getImageUrl(baseUrl, imageId, fanartTag, apiKey, 640, "Thumb")
+            else client.getBackdropUrl(baseUrl, imageId, null, apiKey, 640)
+        } else if (tag != null) client.getImageUrl(baseUrl, imageId, tag, apiKey, 480)
         else "${baseUrl}/emby/Items/$imageId/Images/Primary?maxWidth=480&quality=80"
     }
 
@@ -182,7 +187,6 @@ class HorizontalItemAdapter(
         val rating: TextView? = view.findViewById(R.id.ratingText)
         val unwatchedBadge: TextView? = null // 设计稿：海报无角标
         val imageBox: View? = view.findViewById(R.id.imageBox)
-        val progressBar: View? = view.findViewById(R.id.progressBar)
         val progressFill: View? = view.findViewById(R.id.progressFill)
         val progressTrack: View? = view.findViewById(R.id.progressTrack)
         val percentText: TextView? = view.findViewById(R.id.percentText)
