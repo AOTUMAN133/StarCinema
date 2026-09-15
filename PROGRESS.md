@@ -74,6 +74,7 @@
 
 ## 四、关键技术备忘（来自旧项目调试）
 
+- **隐私守则（用户明确要求）**：服务器地址、账号、密码、API Key、access token、user id 等**绝不出现在源码/文档/PROGRESS 中**。所有连接信息由用户运行时通过 SharedPreferences 输入。源码扫描命令：`grep -rEn '192\.168\.1\.|28096|48096|d916bdc|d916bdc17e6e4443ab72a9441a7a249b|test_token|test-key' app/src/main/java app/src/main/res/values`
 - **安装包**：release 签名才能覆盖盒子现有包（debug 包 INSTALL_FAILED_UPDATE_INCOMPATIBLE）
 - **构建输出**：APK 名带 ABI 后缀 app-armeabi-v7a-release.apk（之前一直装错 app-debug.apk 导致测旧代码）
 - **R8**：release 开启会剥 Log；调试临时 isMinifyEnabled=false
