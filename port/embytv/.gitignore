@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# APK 输出
+*.apk
+*.aab
+
+# 大体积 AAR 不入库 (GitHub 100MB 限制)
+libs/*.aar

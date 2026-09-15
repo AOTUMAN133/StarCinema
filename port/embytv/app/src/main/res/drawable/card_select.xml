@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 深色主题(全量复刻 AfuseKtV): 聚焦 = 深色底 + 白色描边 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#DA181818"/>
+    <corners android:radius="18dp"/>
+    <stroke
+        android:width="2dp"
+        android:color="#FFFFFF"/>
+</shape>

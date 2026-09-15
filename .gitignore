@@ -13,3 +13,7 @@ captures/
 !debug.keystore
 # 大文件 AAR 不入库
 /libs/*.aar
+
+# MPV AAR 本地资产(109MB,不入 git)
+port/embytv/libs/*.aar
+*.aar

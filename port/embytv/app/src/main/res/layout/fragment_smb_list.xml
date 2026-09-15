@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SMB 网络播放"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/md_theme_onSurface"
+            android:padding="12dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/smbList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:nextFocusUp="@id/addBtn" />
+
+        <TextView
+            android:id="@+id/addBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ 添加 SMB 服务器"
+            android:textSize="16sp"
+            android:textColor="@color/apple_text"
+            android:gravity="center"
+            android:padding="14dp"
+            android:focusable="true"
+            android:nextFocusUp="@id/addBtn"
+            android:nextFocusDown="@id/smbList"
+            android:clickable="true"
+            android:background="@drawable/btn_select_circle" />
+    </LinearLayout>
+</FrameLayout>

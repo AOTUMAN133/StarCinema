@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:background="@color/black">
+
+    <!-- 视频渲染 Surface（EXO/MPV 共用）
+         外层 FrameLayout 全屏容器负责居中（ConstraintLayout 不识别 layout_gravity）。
+         AspectRatioFrameLayout（官方 PlayerView 同款）保持视频宽高比：
+         - EXO 内核：setAspectRatio(视频比例) → 容器自我重测为视频比例，surface 不变形
+         - MPV 内核：setAspectRatio(0) → 容器全屏，MPV 自己处理 letterbox
+         ⚠️ 不要用 videoScalingMode（对硬解无效）或 dimensionRatio（ConstraintLayout 夹回）。 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.media3.ui.AspectRatioFrameLayout
+            android:id="@+id/videoFrame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+            <com.embytv.player.surface.RenderSurfaceView
+                android:id="@+id/renderSurface"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </androidx.media3.ui.AspectRatioFrameLayout>
+    </FrameLayout>
+
+    <!-- ASS 字幕拓展渲染层（libass：经 AssHandler 绘制 ASS/SSA 字幕，含特效/样式） -->
+    <FrameLayout
+        android:id="@+id/assSubtitleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- PGS 位图字幕（EXO 输出的 bitmap cue）：独立层，避免被 attachAssSubtitleView 的 removeAllViews 清掉 -->
+    <ImageView
+        android:id="@+id/bitmapSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:maxWidth="480dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 弹幕层 -->
+    <master.flame.danmaku.ui.widget.DanmakuView
+        android:id="@+id/danmakuView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layerType="hardware"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- MPV OSD 字幕渲染 -->
+    <com.embytv.player.surface.MpvOsdSurfaceView
+        android:id="@+id/mpvOsdSurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- EXO 文本字幕 -->
+    <TextView android:id="@+id/subtitleText"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="bottom|center_horizontal"
+        android:paddingHorizontal="40dp"
+        android:textColor="#ffffff" android:textSize="24sp"
+        android:shadowColor="#000000" android:shadowDx="2" android:shadowDy="2"
+        android:shadowRadius="4" android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 背景图 -->
+    <ImageView android:id="@+id/background"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:scaleType="centerCrop" android:visibility="gone" />
+
+    <!-- 顶部当前时间 -->
+    <TextView android:id="@+id/timeTextView"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="30dp" android:elevation="10dp"
+        android:shadowColor="@color/black" android:shadowDx="2" android:shadowDy="2"
+        android:shadowRadius="4" android:textColor="#ffffff" android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 顶部倍速显示 -->
+    <TextView android:id="@+id/speedTextView"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="30dp" android:layout_marginEnd="26dp" android:elevation="10dp"
+        android:shadowColor="@color/black" android:shadowDx="2" android:shadowDy="2"
+        android:shadowRadius="4" android:textColor="#ffffff" android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 版本自检标签（用于确认安装的是新版，发布前保留） -->
+    <TextView android:id="@+id/versionTag"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginEnd="26dp" android:layout_marginTop="6dp"
+        android:textColor="#66ffffff" android:textSize="11sp"
+        android:text="@string/app_version_label"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@+id/kernelInfoText" />
+
+    <!-- 解码信息（真右上角, 不依赖 speedTextView 显隐） -->
+    <TextView android:id="@+id/kernelInfoText"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="30dp" android:layout_marginEnd="26dp" android:elevation="10dp"
+        android:shadowColor="@color/black" android:shadowDx="2" android:shadowDy="2"
+        android:shadowRadius="4" android:textColor="#34C759" android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 倍速提示浮层 -->
+    <LinearLayout android:id="@+id/speed_fast_tip"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/round_back"
+        android:gravity="center" android:orientation="horizontal"
+        android:paddingHorizontal="20dp" android:paddingVertical="5dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:src="@drawable/fast_forward_tip" app:tint="#ffffff" />
+        <TextView android:id="@+id/speed_value_tip"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginStart="5dp" android:text="X2" android:textColor="#ffffff" />
+    </LinearLayout>
+
+    <!-- 手势提示 -->
+    <TextView android:id="@+id/gestureTextView"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:gravity="center" android:paddingBottom="110dp"
+        android:shadowColor="#000000" android:shadowDx="0" android:shadowDy="0"
+        android:shadowRadius="4" android:textAlignment="center"
+        android:textColor="#ffffff" android:textSize="36sp" android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- 视频标题（左上角） -->
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/name_box"
+        android:layout_width="wrap_content" android:layout_height="0dp"
+        android:layout_marginBottom="14dp" android:paddingTop="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/pixel"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <ImageView android:id="@+id/back_btn"
+            android:layout_width="44dp" android:layout_height="44dp"
+            android:layout_marginStart="16dp" android:layout_marginTop="6dp"
+            android:padding="10dp"
+            android:background="@drawable/bg_btn_circle_gold"
+            android:focusable="true"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+        <TextView android:id="@+id/videoName"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginStart="14dp" android:layout_marginTop="6dp"
+            android:ellipsize="end" android:maxLines="1"
+            android:textColor="#ffffff" android:textSize="20sp" android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toEndOf="@id/back_btn" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 分辨率标签（左下角，纯展示不可聚焦，防止焦点逃逸） -->
+    <TextView android:id="@+id/pixel"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp" android:layout_marginStart="14dp"
+        android:background="@drawable/video_selector"
+        android:elevation="10dp" android:focusable="false"
+        android:paddingHorizontal="6dp" android:paddingVertical="2dp"
+        android:textColor="@color/btn_icon_no_select" android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_control"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 上键展开提示（悬浮箭头：进度条在上按 ↑ 展开更多功能，随控制栏显隐） -->
+    <LinearLayout android:id="@+id/swipe_up_hint"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/round_back_hint"
+        android:elevation="12dp"
+        android:focusable="false" android:focusableInTouchMode="false"
+        android:gravity="center" android:orientation="horizontal"
+        android:paddingHorizontal="14dp" android:paddingVertical="6dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_control"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <ImageView
+            android:layout_width="18dp" android:layout_height="18dp"
+            android:contentDescription="上键提示"
+            android:src="@drawable/expand_less"
+            app:tint="#FFFFFF" />
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="上键展开更多"
+            android:textColor="#FFFFFF" android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- ============ 底部控制栏（常驻） ============ -->
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/bottom_control"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@drawable/player_top_box_back_new"
+        android:focusable="false" android:focusableInTouchMode="false"
+        android:paddingTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- 第 1 层：进度条 -->
+        <LinearLayout android:id="@+id/bottomBox"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="5dp" android:layout_marginBottom="5dp"
+            android:focusable="true" android:focusableInTouchMode="true"
+            android:gravity="center" android:orientation="horizontal"
+            android:nextFocusDown="@+id/play_pause"
+            android:paddingHorizontal="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/play_control_box">
+            <TextView android:id="@+id/progress_now" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:fontFamily="sans-serif"
+                android:gravity="center" android:shadowColor="@color/black"
+                android:shadowDx="2" android:shadowDy="2" android:shadowRadius="4"
+                android:text="00:00" android:textColor="#B3FFFFFF" android:textSize="12sp" />
+            <SeekBar android:id="@+id/seekBar" android:layout_width="0dp"
+                android:layout_height="24dp" android:layout_weight="1"
+                android:duplicateParentState="true" android:focusable="false"
+                android:focusableInTouchMode="false" android:maxHeight="6dp"
+                android:minHeight="6dp" android:progressDrawable="@drawable/seekbar_progress"
+                android:splitTrack="false" android:thumb="@drawable/seekbar_thumb" />
+            <TextView android:id="@+id/progress_all" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:fontFamily="sans-serif"
+                android:shadowColor="@color/black" android:shadowDx="2" android:shadowDy="2"
+                android:shadowRadius="4" android:text="00:00"
+                android:textColor="#B3FFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 第 2 层：播放控制 -->
+        <LinearLayout android:id="@+id/play_control_box"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:gravity="center" android:orientation="horizontal"
+            android:paddingHorizontal="20dp" android:paddingBottom="@dimen/activity_vertical_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <ImageView android:id="@+id/skip_previous" android:layout_width="40dp"
+                android:layout_height="40dp" android:layout_marginEnd="20dp"
+                android:background="@drawable/btn_select_circle"
+                android:focusable="true" android:focusableInTouchMode="true"
+                android:nextFocusRight="@+id/play_pause"
+                android:padding="10dp" android:src="@drawable/skip_previous_fill"
+                android:visibility="gone" app:tint="@color/btn_icon_no_select" />
+            <ImageView android:id="@+id/play_pause" android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_select_circle"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusLeft="@+id/skip_previous" android:nextFocusRight="@+id/skip_next"
+                android:padding="10dp" android:src="@drawable/icon_play_btn"
+                app:tint="@color/btn_icon_no_select" />
+            <ImageView android:id="@+id/skip_next" android:layout_width="40dp"
+                android:layout_height="40dp" android:layout_marginStart="20dp"
+                android:background="@drawable/btn_select_circle"
+                android:focusable="true" android:focusableInTouchMode="true"
+                android:nextFocusLeft="@+id/play_pause"
+                android:padding="10dp" android:src="@drawable/skip_next"
+                android:visibility="gone" app:tint="@color/btn_icon_no_select" />
+        </LinearLayout>
+
+        <!-- 倍速（右下角） -->
+        <TextView android:id="@+id/speed_text"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/btn_select_circle"
+            android:clickable="true" android:focusable="true"
+            android:paddingHorizontal="14dp" android:paddingVertical="4dp"
+            android:shadowColor="@color/black" android:shadowDx="2" android:shadowDy="2"
+            android:shadowRadius="4" android:elevation="10dp"
+            android:text="X1.0" android:textColor="#ffffff" android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/play_control_box"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/play_control_box" />
+
+        <!-- 上滑提示动画 -->
+        <ImageView android:id="@+id/anime_tip"
+            android:layout_width="40dp" android:layout_height="40dp"
+            android:focusable="false" android:focusableInTouchMode="false"
+            android:padding="10dp" android:src="@drawable/arrow_down_anime"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:tint="@color/btn_icon_no_select" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ============ 上滑控制面板（内联，不用 include） ============ -->
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/panel_overlay"
+        android:layout_width="0dp" android:layout_height="0dp"
+        android:background="@drawable/player_top_box_back_new2"
+        android:paddingHorizontal="14dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 视频信息 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/video_info_box"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:focusable="false" android:paddingVertical="16dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/other_control_bottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/other_video_poster"
+                android:layout_width="120dp" android:layout_height="0dp"
+                android:focusable="false"
+                app:cardCornerRadius="6dp" app:cardElevation="2dp"
+                app:layout_constraintDimensionRatio="1:0.6"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@color/transparent" app:strokeWidth="0dp">
+                <ImageView
+                    android:id="@+id/other_video_poster_img"
+                    android:layout_width="match_parent" android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView android:id="@+id/other_video_title"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:ellipsize="end" android:focusable="false" android:maxLines="2"
+                android:textColor="@color/white" android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/other_video_poster"
+                app:layout_constraintTop_toTopOf="@+id/other_video_poster" />
+
+            <TextView android:id="@+id/other_video_overview"
+                android:layout_width="0dp" android:layout_height="0dp"
+                android:layout_marginStart="10dp" android:layout_marginTop="6dp"
+                android:ellipsize="end" android:focusable="false" android:maxLines="3"
+                android:textColor="@color/white_sub" android:textSize="13sp"
+                app:layout_constraintBottom_toBottomOf="@+id/other_video_poster"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/other_video_poster"
+                app:layout_constraintTop_toBottomOf="@+id/other_video_title" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/other_actor"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:focusable="false"
+                android:focusableInTouchMode="false" android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/other_video_poster" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 底部控制区 -->
+        <LinearLayout android:id="@+id/other_control_bottom"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp" android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- 选集行 -->
+            <LinearLayout android:id="@+id/other_select_ep"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:visibility="gone">
+                <com.rubensousa.dpadrecyclerview.DpadRecyclerView
+                    android:id="@+id/other_episode_list"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </LinearLayout>
+
+            <!-- 第 1 行：字幕/音轨/弹幕/倍速/画面比例/单集循环 -->
+            <LinearLayout
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical" android:orientation="horizontal">
+                <TextView android:id="@+id/other_subtitle_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="字幕"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <TextView android:id="@+id/other_audio_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="音轨"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <LinearLayout android:id="@+id/other_danmu_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:orientation="horizontal"
+                    android:paddingStart="20dp" android:paddingEnd="14dp">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:gravity="center" android:paddingVertical="8dp"
+                        android:text="弹幕" android:textColor="@color/focus_text_color"
+                        android:textSize="14sp" />
+                    <ImageView android:id="@+id/other_danmu_status"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp" />
+                </LinearLayout>
+                <TextView android:id="@+id/other_speed_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="倍速"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <TextView android:id="@+id/other_video_scale_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="画面比例"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <LinearLayout android:id="@+id/other_repeat_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:orientation="horizontal"
+                    android:paddingStart="20dp" android:paddingEnd="14dp">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:gravity="center" android:paddingVertical="8dp"
+                        android:text="单集循环" android:textColor="@color/focus_text_color"
+                        android:textSize="14sp" />
+                    <ImageView android:id="@+id/other_repeat_status"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 第 2 行：解码/内核/设置/定时关机/版本 -->
+            <LinearLayout
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical" android:orientation="horizontal">
+                <LinearLayout android:id="@+id/other_ffmpeg_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:orientation="horizontal"
+                    android:paddingStart="20dp" android:paddingEnd="14dp">
+                    <TextView android:id="@+id/other_hwdec_text"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:gravity="center" android:paddingVertical="8dp"
+                        android:text="解码 HW" android:textColor="@color/focus_text_color"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <TextView android:id="@+id/other_kernel_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="EXO"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <TextView android:id="@+id/other_subsize_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="字幕 A+"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <TextView android:id="@+id/other_set_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="设置"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+                <LinearLayout android:id="@+id/other_timer_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:orientation="horizontal"
+                    android:paddingStart="20dp" android:paddingEnd="14dp">
+                    <TextView
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:gravity="center" android:paddingVertical="8dp"
+                        android:text="定时关机" android:textColor="@color/focus_text_color"
+                        android:textSize="14sp" />
+                    <ImageView android:id="@+id/other_timer_status"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp" />
+                </LinearLayout>
+                <TextView android:id="@+id/other_version_btn"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:background="@drawable/btn_select" android:focusable="true"
+                    android:gravity="center" android:paddingHorizontal="20dp"
+                    android:paddingVertical="8dp" android:text="版本"
+                    android:textColor="@color/focus_text_color" android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView android:id="@+id/other_config_tips"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginStart="20dp" android:layout_marginTop="4dp"
+                android:textColor="@color/white" android:textSize="12sp"
+                android:visibility="gone" />
+            <TextView android:id="@+id/other_extend_tip"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginStart="20dp" android:layout_marginTop="4dp"
+                android:textColor="@color/white" android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 设置面板（右侧） -->
+    <include android:id="@+id/play_view_for_set"
+        layout="@layout/play_view_for_set_exo"
+        android:layout_width="460dp" android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 轨道选择面板（右侧 40%） -->
+    <include android:id="@+id/track_selection_view"
+        layout="@layout/track_selection_view"
+        android:layout_width="0dp" android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 加载动画 -->
+    <LinearLayout android:id="@+id/loading"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:gravity="center" android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ProgressBar style="?android:attr/progressBarStyleLarge"
+            android:layout_width="48dp" android:layout_height="48dp" />
+        <TextView android:id="@+id/loading_speed"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:elevation="10dp" android:shadowColor="@color/black"
+            android:shadowDx="2" android:shadowDy="2" android:shadowRadius="4"
+            android:textColor="#ffffff" android:textSize="18sp" />
+    </LinearLayout>
+
+    <!-- 星光影院：字幕大小调节面板（OSD 直达，右下角+三角指针） -->
+    <LinearLayout android:id="@+id/subtitleSizePanel"
+        android:layout_width="420dp" android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_subsize_panel"
+        android:padding="20dp"
+        android:visibility="gone"
+        android:elevation="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_control"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="60dp">
+
+        <!-- 三角指针（指向字幕A+按钮） -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="12dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="36dp"
+            android:background="@drawable/bg_panel_pointer" />
+
+        <TextView
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="字幕大小"
+            android:textColor="@color/star_gold"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView android:id="@+id/subSizeMinus"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/btn_select" android:focusable="true"
+                android:gravity="center" android:text="−"
+                android:textColor="@color/star_text" android:textSize="24sp" />
+
+            <SeekBar android:id="@+id/subtitleSizeSeekBar"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp" android:layout_marginEnd="12dp"
+                android:max="140" android:progress="100" />
+
+            <TextView android:id="@+id/subSizePlus"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:background="@drawable/btn_select" android:focusable="true"
+                android:gravity="center" android:text="+"
+                android:textColor="@color/star_text" android:textSize="24sp" />
+        </LinearLayout>
+
+        <TextView android:id="@+id/subSizeValue"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="100%"
+            android:textColor="@color/star_text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

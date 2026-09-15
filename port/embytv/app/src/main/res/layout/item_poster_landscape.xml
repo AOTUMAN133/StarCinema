@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：继续观看横版信息卡（左侧方形封面 + 右侧标题/进度文字/金色进度条/百分比） -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/imageBox"
+    android:layout_width="400dp"
+    android:layout_height="112dp"
+    android:layout_marginEnd="12dp"
+    android:focusable="true"
+    android:clickable="true"
+    android:clipChildren="false"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/star_card_light"
+    app:cardElevation="0dp"
+    app:strokeColor="#00FFFFFF"
+    app:strokeWidth="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:clipChildren="false">
+
+        <!-- 左侧方形封面 -->
+        <FrameLayout
+            android:id="@+id/posterBox"
+            android:layout_width="112dp"
+            android:layout_height="match_parent"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:id="@+id/posterImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <!-- 星光影院：金色进度条（底部叠在封面上） -->
+            <View
+                android:id="@+id/progressBar"
+                android:layout_width="0dp"
+                android:layout_height="5dp"
+                android:layout_gravity="bottom|start"
+                android:background="@color/star_gold" />
+        </FrameLayout>
+
+        <!-- 右侧信息区 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/subtitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/star_text_secondary"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:weightSum="100">
+
+                <View
+                    android:id="@+id/progressFill"
+                    android:layout_width="0dp"
+                    android:layout_height="4dp"
+                    android:layout_weight="0"
+                    android:background="@drawable/bg_progress_fill" />
+
+                <View
+                    android:id="@+id/progressTrack"
+                    android:layout_width="0dp"
+                    android:layout_height="4dp"
+                    android:layout_weight="100"
+                    android:background="@drawable/bg_progress_track" />
+
+                <TextView
+                    android:id="@+id/percentText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/star_text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

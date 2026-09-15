@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/md_theme_onSurface"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:text="AList 网盘配置" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="支持公网/内网 AList 服务器，登录后浏览目录播放视频"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="服务器名称"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/serverName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:padding="12dp"
+            android:textColor="@color/md_theme_onSurface"
+            android:textColorHint="@color/md_theme_onSurfaceVariant"
+            android:background="@drawable/tv_focus_border"
+            android:focusable="true"
+            android:clickable="true"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@+id/serverUrl"
+            android:hint="例如: 我的网盘" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="AList 地址"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/serverUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:padding="12dp"
+            android:textColor="@color/md_theme_onSurface"
+            android:textColorHint="@color/md_theme_onSurfaceVariant"
+            android:background="@drawable/tv_focus_border"
+            android:focusable="true"
+            android:clickable="true"
+            android:inputType="textUri"
+            android:imeOptions="actionNext"
+            android:nextFocusUp="@+id/serverName"
+            android:nextFocusDown="@+id/username"
+            android:hint="http://192.168.1.100:5244" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="用户名"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:padding="12dp"
+            android:textColor="@color/md_theme_onSurface"
+            android:textColorHint="@color/md_theme_onSurfaceVariant"
+            android:background="@drawable/tv_focus_border"
+            android:focusable="true"
+            android:clickable="true"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:nextFocusUp="@+id/serverUrl"
+            android:nextFocusDown="@+id/password"
+            android:hint="AList 账号" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="密码"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:padding="12dp"
+            android:textColor="@color/md_theme_onSurface"
+            android:textColorHint="@color/md_theme_onSurfaceVariant"
+            android:background="@drawable/tv_focus_border"
+            android:focusable="true"
+            android:clickable="true"
+            android:inputType="textPassword"
+            android:imeOptions="actionDone"
+            android:nextFocusUp="@+id/username"
+            android:nextFocusDown="@+id/testBtn"
+            android:hint="AList 密码" />
+
+        <TextView
+            android:id="@+id/testBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="测试连接"
+            android:textColor="@color/md_theme_primary"
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:nextFocusUp="@+id/password"
+            android:background="@drawable/btn_select_circle" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/saveBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="保存"
+            android:textColor="@color/md_theme_onPrimary"
+            android:textSize="16sp"
+            android:padding="14dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:nextFocusUp="@+id/testBtn"
+            android:background="@drawable/btn_select_circle" />
+
+    </LinearLayout>
+
+</ScrollView>
