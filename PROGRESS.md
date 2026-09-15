@@ -32,7 +32,13 @@
    - PlayerActivity（1631 行）+ TrackSelectionAdapter + danmu 模块 5 文件 + 播放页 6 layout + 全量 drawable/color/raw 资源
    - DanmakuFlameMaster 弹幕依赖
    - ✅ **小米盒子真机验证通过**：测试服务器 28096 拉流，《"大"人物》成功播放（EXO/MPV 内核工作正常），focus 已进 PlayerActivity
-   - MainActivity 临时验证入口（M3 重写为抽屉+Fragment）
+10. ✅ **M3 抽屉+首页完成**（v0.3.0）：
+   - MainActivity（顶部导航栏 ☰/Logo/首页搜索设置 + 时间WiFi + ViewPager2 首页层 + 子页面容器 + 返回栈处理）
+   - EmbyFragment 首页：Hero 大横幅轮播（6s 自动 + 手动翻页 + 指示点，高亮项金色）+ 热门推荐/继续观看内容行（海报+评分+续播角度标）
+   - 左侧抽屉：媒体库列表（动态 Emby 库）+ 金色胶囊选中态；左键行内左边缘/☰ 打开
+   - VideoTypeRecyclerAdapterDiff + **LibraryGridFragment（M4 前置搬运）**
+   - 临时自动连接测试服务器（M5 登录页后替换）；openDetail/搜索/设置暂为 M5 占位
+   - ✅ **小米盒子真机验证通过**：首页 Hero 轮播真实数据、《出入平安》《丰臣兄弟》等海报行完整、抽屉展开正常
    - ✅ **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
 ## 三、待办（下一步）

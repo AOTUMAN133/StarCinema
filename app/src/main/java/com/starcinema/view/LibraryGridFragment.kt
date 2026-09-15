@@ -329,14 +329,7 @@ class GridAdapter(
         } else {
             h.rating.visibility = View.GONE
         }
-        // 未看剧集数 badge（右上角，仅剧集且有未看时显示）
-        val unplayed = if (item.type == "Series") item.userData?.unplayedItemCount else null
-        if (unplayed != null && unplayed > 0) {
-            h.unwatchedBadge.visibility = View.VISIBLE
-            h.unwatchedBadge.text = unplayed.toString()
-        } else {
-            h.unwatchedBadge.visibility = View.GONE
-        }
+        // 定稿：媒体库页无角标（原 unwatchedBadge 逻辑已随定稿删除）
         EmbyImageLoader.load(h.image, urls[pos])
         h.itemView.setOnClickListener { onClick(item) }
         // 网格上键 → 直达当前选中的筛选标签（防止几何搜索逃逸到首页）
@@ -358,7 +351,6 @@ class GridAdapter(
         val image: ImageView = v.findViewById(R.id.posterImage)
         val title: TextView = v.findViewById(R.id.titleText)
         val rating: TextView = v.findViewById(R.id.ratingText)
-        val unwatchedBadge: TextView = v.findViewById(R.id.unwatchedBadge)
         val imageBox: View? = v.findViewById(R.id.imageBox)
     }
 }
