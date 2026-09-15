@@ -49,7 +49,7 @@ class EmbyFragment : Fragment() {
         override fun run() {
             if (heroItems.size > 1 && isAdded) {
                 showHero((heroIndex + 1) % heroItems.size)
-                heroHandler.postDelayed(this, 6000)
+                heroHandler.postDelayed(this, 5000)
             }
         }
     }
@@ -384,7 +384,7 @@ class EmbyFragment : Fragment() {
 
     private fun startHeroAutoPlay() {
         stopHeroAutoPlay()
-        if (heroItems.size > 1 && isAdded) heroHandler.postDelayed(heroAutoPlay, 6000)
+        if (heroItems.size > 1 && isAdded) heroHandler.postDelayed(heroAutoPlay, 5000)
     }
 
     /** Hero 横幅是否持有焦点（MainActivity 左键拦截须跳过，让 Hero 自己翻页） */
@@ -631,7 +631,7 @@ class EmbyFragment : Fragment() {
         val rows = mutableListOf<VideoType>()
 
         // 定稿图：热门推荐第一行（跨库聚合）
-        val hot = latest.flatMap { it.second }.distinctBy { it.id }.take(24)
+        val hot = latest.flatMap { it.second }.distinctBy { it.id }.take(6) // 设计文档 v1.0：热门推荐横向滚动 6 张竖版海报
         if (hot.isNotEmpty()) {
             val hotAdapter = HorizontalItemAdapter(
                 hot, baseUrl, apiKey, client,

@@ -63,13 +63,14 @@
     <!-- ===== 兼容补丁（旧代码/播放器布局仍引用） ===== -->
     <color name="focus_text_color">#F5C542</color>
     <color name="md_theme_background">#ff0E0F13</color>
-    <color name="md_theme_on">#ffE6E1E5</color>
+    <color name="md_theme_onPrimary">#ff201500</color>
+    <color name="md_theme_onSurface">#ffe2e2e9</color>
+    <color name="md_theme_onSurfaceVariant">#ffc4c6d0</color>
     <color name="md_theme_outline">#ff7F7577</color>
     <color name="md_theme_primary">#ffD0BCFF</color>
     <color name="night_transparent_back">#CC141414</color>
     <color name="night_transparent_back_75">#BF141414</color>
     <color name="night_transparent_back_90">#E6141414</color>
-    <color name="slider_thumb_color">#F5C542</color>
     <color name="star_card_light">#24262E</color>
     <color name="star_divider">#2A2C33</color>
     <color name="star_text">#E2E2E9</color>
