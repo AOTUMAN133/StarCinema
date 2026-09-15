@@ -1,11 +1,11 @@
 # 星空影院 StarCinema — 进度存档
 
-> 最后更新：2026-09-15
+> 最后更新：2026-09-15（v0.0.8）
 > 新会话恢复先读本文件 + README.md + docs/ 下三份计划文档
 
 ## 一、项目状态
 
-- **新项目目录**：/root/StarCinema（git 已初始化，6 个 commit，全部留痕）
+- **新项目目录**：/root/StarCinema（git 已初始化，全部留痕）
 - **旧项目**：/root/EmbyTV（滴滴TV）**保持不动**，只读取移植
 - **目标**：按设计稿从零重写 UI 层（星空影院），内核/API/工具层整体移植自 EmbyTV
 
@@ -15,16 +15,20 @@
 2. ✅ 设计稿原则（README 第四节：版面不完整→以风格为准，按 TV 端特点优化）
 3. ✅ **移植清单** docs/porting-plan.md（A 组内核/API/工具复制、B 组 UI 重写、C 组不移植）
 4. ✅ **骨架计划** docs/skeleton-plan.md（单 Activity+Fragment、抽屉 9 项映射、M1-M6 里程碑）
-5. ✅ **设计稿素材 8 张**已入库 docs/design-assets/：
-   - 01-APP图标.jpg / 02-首页.jpg / 03-服务器登录页.jpg
-   - 04-电影详情页.jpg / 05-剧集详情页.jpg / 06-演员作品.jpg
-   - 07-搜索页.jpg / 08-播放界面页.jpg
-   - （另有 2 张媒体库页在 .hermes cache：img_1f6bf3d9e103.jpg、img_2ff52aee9810.jpg）
-6. ✅ **媒体库页设计规格** docs/design-media-library.md（唯一已完成深度分析的页面）
+5. ✅ **设计稿素材 9 张**已入库 docs/design-assets/：图标/首页/登录/电影详情/剧集详情/演员作品/搜索/播放 + 媒体库（媒体库 2 张图在 .hermes cache）
+6. ✅ **8 页设计稿全部深度分析完成**（每页 → docs/design-*.md 规格）：
+   - design-media-library.md（媒体库页，最早完成）
+   - design-app-icon.md（APP 图标：黑金 3D 星形，squircle，无文字）
+   - design-home.md（首页：L 型导航 + Hero 横幅轮播 + 内容行）
+   - design-server-login.md（服务器登录页：左侧"添加服务器"金卡 + 右侧服务器列表）
+   - design-movie-detail.md（电影详情页：沉浸背景 + 左侧信息 + 主演/推荐横排）
+   - design-series-detail.md（剧集详情页：分季胶囊 + 分集卡片 + 时长角标）
+   - design-actor-works.md（演员作品页：金边头像 + 作品年表横排 + 焦点标题变金）
+   - design-search.md（搜索页：大胶囊搜索框 + 热门标签 + 大家都在看）
+   - design-player.md（播放界面页：金进度条 + 11 按钮排 + 字幕大小面板）
 
 ## 三、待办（下一步）
 
-- [ ] 设计稿逐页深度分析：首页、服务器登录页、电影详情页、剧集详情页、演员作品、搜索页、播放界面页、APP图标（每页 → docs/design-*.md 规格文档）
 - [ ] 确认新包名（建议 com.starcinema，待用户拍板）
 - [ ] M1 骨架：gradle + manifest + 包结构 + 依赖 + 搬运 A 组（内核/API/工具）
 - [ ] M2 播放页接入 → M3 抽屉+首页 → M4 媒体库 → M5 详情/搜索/设置 → M6 打磨
