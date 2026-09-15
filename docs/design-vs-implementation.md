@@ -83,8 +83,8 @@
 ## 九、汇总（M6 打磨施工优先级）
 
 | P1（必做） | ✅ LG1 已完成：移除 EmbyFragment 临时自动连接，引导用户到 ServerListFragment 添加服务器；**隐私数据（服务器地址/账号/密码）一律由用户运行时输入，绝不入源码**（M6 收尾 2026-09-15） |
-| P2（应做） | ③ H1/H5 首页 Hero 去掉"立即播放"按钮和剧集数红色角标<br>④ D2 抽屉 Logo 改金色五角星<br>⑤ SR1 搜索页真机验证 |
-| P3（打磨） | ⑥ M2 详情页元数据合并到一行<br>⑦ D4 抽屉选中项加渐变 + 发光<br>⑧ S1-S3 剧集详情页真机验证<br>⑨ M6 演员作品页 / 搜索结果 / 设置页整体真机验证 |
+| P2（应做） | ✅ ③ H1/H5 首页 Hero 去掉"立即播放"按钮 + 剧集数红色角标（fragment_emby.xml 删除 bannerPlayBtn 节点、item_poster_card.xml 删除 unwatchedBadge 节点、EmbyFragment 点击迁移到 bannerArea）<br>✅ ④ D2 抽屉 Logo 改金色五角星（ic_logo.xml → ic_logo_star.xml）<br>⏳ ⑤ SR1 搜索页真机验证（需服务器就绪；空状态/热门词 UI 已实现，详情搜索逻辑待用户在真服务器验） |
+| P3（打磨） | ✅ ⑥ M2 详情页元数据字号 16sp→22sp、⭐→★（fragment_detail.xml、DetailFragment.kt）<br>✅ ⑦ D4 抽屉选中项渐变 + 发光（bg_sidebar_focus.xml 已实现左亮右暗渐变 + 三层辉光，无需改）<br>⏳ ⑧ S1-S3 剧集详情页真机验证（需 Series 类型 Emby 项；DetailFragment.kt/SeriesFragment.kt 代码完整）<br>⏳ ⑨ 演员作品/搜索结果/设置页整体真机验证（代码完整，需真服务器数据） |
 
 > **D1 抽屉结构决策（2026-09-15 撤销固定方案）**：原 D1 项"固定 9 项类目"已撤销，原因是不同 Emby 服务器库数量差异大（测试服务器有 10+ 个动态库），固定 9 项会硬塞不存在的类目或漏掉真实的。设计稿里的"首页/电影/电视剧/综艺/动漫/纪录片/演唱会/4K/合集"是示例图，不是强约束。**当前方案保留**：抽屉是 Emby 真实库列表的镜像 + 首页/搜索/设置固定入口（顶部栏已有搜索设置入口，下一步可考虑从抽屉移除 search/settings 让抽屉更纯粹）。
 

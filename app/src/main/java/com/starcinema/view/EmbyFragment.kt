@@ -478,8 +478,8 @@ class EmbyFragment : Fragment() {
             }
         }
 
-        // 金色"立即播放"按钮 → 打开当前海报详情（详情页可播放）
-        binding.bannerPlayBtn.setOnClickListener {
+        // 设计稿：Hero 无独立按钮，整个 Hero 区域点按直接进详情
+        binding.bannerArea.setOnClickListener {
             heroItems.getOrNull(heroIndex)?.let { openDetail(it) }
         }
     }

@@ -1,6 +1,6 @@
 # 星空影院 StarCinema — 进度存档
 
-> 最后更新：2026-09-15（v0.5.0，M5 收尾 + 设计稿核对）
+> 最后更新：2026-09-15（v0.6.0，M6 打磨完成）
 > 新会话恢复先读本文件 + README.md + docs/ 下三份计划文档
 
 ## 一、项目状态
@@ -56,12 +56,21 @@
    - **D1 抽屉结构决策撤销**：固定 9 项 → 保留动态 Emby 库列表（不同服务器库数差异大）
    - **LG1 临时自动连接移除 + 隐私数据清理**：EmbyFragment 内 hardcode `http://192.168.1.33:28096 533/123321 馋死你` 已全部删除，无服务器时引导用户到 ServerListFragment 添加服务器；**所有连接信息由用户运行时输入，源码零硬编码隐私数据**。小米盒子真机验证通过：空状态显示"我的服务器"+"添加服务器"大黄色卡片（对齐 design-server-login.md）
    - **小技巧**：调试时用 `uiautomator dump` 取真实坐标；盒子屏保 `pm disable-user com.xiaomi.mitv.hyper.screensaver` + `pm disable-user com.mitv.tvhome` 防止抢前台
+
+**14. ✅ M6 打磨完成（v0.6.0，2026-09-15）**：
+   - ✅ **P2-③ 首页 Hero 去"立即播放"+ 剧集数红色角标**：fragment_emby.xml 删除 bannerPlayBtn 节点；item_poster_card.xml 删除 unwatchedBadge 节点；EmbyFragment 点击迁移到 bannerArea；HorizontalAdapters/DetailFragment 移除 badge 逻辑
+   - ✅ **P2-④ 抽屉 Logo 改金色五角星**：activity_main.xml `ic_logo` → `ic_logo_star`
+   - ⏳ **P2-⑤ 搜索页真机验证**：UI 代码完整（SearchFragment/SearchResultAdapter + 热门词/大家都在看/搜索网格），需真服务器输入做端到端
+   - ✅ **P3-⑥ 详情页元数据字号 16sp→22sp、⭐→★**：fragment_detail.xml 全行更新；与设计稿"2024 · 135分钟 · ★ 8.9"格式对齐
+   - ✅ **P3-⑦ 抽屉选中项渐变 + 发光**：bg_sidebar_focus.xml 已实现左亮右暗渐变 + 三层辉光，无需改动
+   - ⏳ **P3-⑧⑨ 剧集/演员作品/搜索/设置页真机验证**：代码完整，需真服务器数据（用户在自己服务器上验收）
+   - **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
    - ✅ **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
 ## 三、待办（下一步）
 
-- [ ] M5 详情页 + 搜索页 + 设置页（DetailFragment/SearchFragment/SettingsFragment 按设计稿 04/05/07/08 + 服务器登录）→ 替换临时自动连接
-- [ ] M6 打磨：焦点/动画/空态/加载态，全流程体验
+- [ ] P2-⑤ + P3-⑧⑨ 真机搜索/剧集/演员/设置页端到端验证（需真服务器；UI 代码完整）
+- [ ] M6+ release 签名打包 + GitHub 推送（用户自验后定稿发布）
 
 ## 四、关键技术备忘（来自旧项目调试）
 

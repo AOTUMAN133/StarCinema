@@ -99,15 +99,7 @@ class HorizontalItemAdapter(
         } else {
             holder.rating?.visibility = View.GONE
         }
-        // 未看剧集数 badge（右上角，仅剧集且有未看时显示）
-        val unplayed = if (item.type == "Series") item.userData?.unplayedItemCount else null
-        if (unplayed != null && unplayed > 0) {
-            holder.unwatchedBadge?.visibility = View.VISIBLE
-            holder.unwatchedBadge?.text = unplayed.toString()
-        } else {
-            holder.unwatchedBadge?.visibility = View.GONE
-        }
-
+        // 设计稿：海报无角标
         EmbyImageLoader.load(holder.image!!, imageUrls[position])
 
         // 星光影院：继续观看信息卡进度（金色填充+百分比）
@@ -188,7 +180,7 @@ class HorizontalItemAdapter(
         val title: TextView? = view.findViewById(R.id.titleText)
         val subtitle: TextView? = view.findViewById(R.id.subtitleText)
         val rating: TextView? = view.findViewById(R.id.ratingText)
-        val unwatchedBadge: TextView? = view.findViewById(R.id.unwatchedBadge)
+        val unwatchedBadge: TextView? = null // 设计稿：海报无角标
         val imageBox: View? = view.findViewById(R.id.imageBox)
         val progressBar: View? = view.findViewById(R.id.progressBar)
         val progressFill: View? = view.findViewById(R.id.progressFill)

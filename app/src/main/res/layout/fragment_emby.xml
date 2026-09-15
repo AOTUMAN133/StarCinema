@@ -102,34 +102,8 @@
                         android:maxLines="1"
                         android:ellipsize="end" />
 
-                    <!-- 金色胶囊"立即播放"按钮（定稿：▶+黑字黑图标；不可聚焦，避免抢走 Hero 焦点，OK 键由 Hero 统一处理） -->
-                    <LinearLayout
-                        android:id="@+id/bannerPlayBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:background="@drawable/bg_btn_gold"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:focusable="false"
-                        android:paddingHorizontal="18dp"
-                        android:paddingVertical="7dp">
+                    <!-- 设计稿：Hero 无"立即播放"按钮，仅指示点+标题+副标题+标签。点 Hero 整体进详情 -->
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_action_play_black"
-                            android:contentDescription="播放" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="立即播放"
-                            android:textColor="@color/star_bg"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
                 </LinearLayout>
 
                 <!-- 轮播指示点（定稿：右下角） -->

@@ -36,21 +36,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bg_card_bottom_gradient" />
 
-            <!-- 未看剧集数 badge -->
-            <TextView
-                android:id="@+id/unwatchedBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
-                android:background="@drawable/badge_circle"
-                android:gravity="center"
-                android:minWidth="22dp"
-                android:minHeight="22dp"
-                android:paddingHorizontal="4dp"
-                android:textColor="#ffffff"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+            <!-- 设计稿：海报无角标 -->
 
         </FrameLayout>
 

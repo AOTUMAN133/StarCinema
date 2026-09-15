@@ -269,7 +269,7 @@ class DetailFragment : Fragment() {
         binding.infoRow.visibility = View.VISIBLE
         if (detail.communityRating != null) {
             binding.ratingText.visibility = View.VISIBLE
-            binding.ratingText.text = "⭐ ${"%.1f".format(detail.communityRating!!)}"
+            binding.ratingText.text = "★ ${"%.1f".format(detail.communityRating!!)}"
         }
         // 认证分级（OfficialRating: PG-13 / R / TV-MA 等）
         if (!detail.officialRating.isNullOrBlank()) {
@@ -882,14 +882,7 @@ class SimplePosterAdapter(
         val scale = FocusStyleHelper.scaleMultiplier(h.itemView.context)
         val hidden = FocusStyleHelper.hidden(h.itemView.context)
         h.title.text = item.name
-        // 未看剧集数 badge（右上角，仅剧集且有未看时显示）
-        val unplayed = if (item.type == "Series") item.userData?.unplayedItemCount else null
-        if (unplayed != null && unplayed > 0) {
-            h.unwatchedBadge?.visibility = android.view.View.VISIBLE
-            h.unwatchedBadge?.text = unplayed.toString()
-        } else {
-            h.unwatchedBadge?.visibility = android.view.View.GONE
-        }
+        // 设计稿：相关推荐无角标
         EmbyImageLoader.load(h.image, imageUrls[pos])
         h.itemView.setOnClickListener { onClick(item) }
         h.itemView.onFocusChangeListener = android.view.View.OnFocusChangeListener { v, hasFocus ->
@@ -910,7 +903,7 @@ class SimplePosterAdapter(
     class ViewHolder(v: android.view.View) : RecyclerView.ViewHolder(v) {
         val image: ImageView = v.findViewById(R.id.posterImage)
         val title: TextView = v.findViewById(R.id.titleText)
-        val unwatchedBadge: TextView? = v.findViewById(R.id.unwatchedBadge)
+        val unwatchedBadge: TextView? = null // 设计稿：无角标
         val imageBox: View? = v.findViewById(R.id.imageBox)
     }
 }
