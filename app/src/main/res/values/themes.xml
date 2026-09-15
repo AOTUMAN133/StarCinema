@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 星空影院：深色主题（设计稿：黑金） -->
+    <style name="Theme.StarCinema" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/star_bg</item>
+        <item name="android:colorBackground">@color/star_bg</item>
+        <item name="colorPrimary">@color/star_gold</item>
+        <item name="colorOnPrimary">@color/star_bg</item>
+        <item name="colorPrimaryContainer">@color/star_card</item>
+        <item name="colorOnPrimaryContainer">@color/star_text</item>
+        <item name="colorSecondary">@color/star_gold</item>
+        <item name="colorOnSecondary">@color/star_bg</item>
+        <item name="colorSecondaryContainer">@color/star_card</item>
+        <item name="colorOnSecondaryContainer">@color/star_text</item>
+        <item name="colorTertiary">@color/star_gold</item>
+        <item name="colorOnTertiary">@color/star_bg</item>
+        <item name="colorError">#ffB3261E</item>
+        <item name="colorOnError">#ffFFFFFF</item>
+        <item name="colorSurface">@color/star_bg</item>
+        <item name="colorOnSurface">@color/star_text</item>
+        <item name="colorSurfaceVariant">@color/star_card</item>
+        <item name="colorOnSurfaceVariant">@color/star_text_secondary</item>
+        <item name="colorOutline">@color/star_divider</item>
+        <item name="android:statusBarColor">@color/star_bg</item>
+        <item name="android:navigationBarColor">@color/star_bg</item>
+    </style>
+</resources>
