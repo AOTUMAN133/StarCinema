@@ -1,6 +1,6 @@
 # 星空影院 StarCinema — 进度存档
 
-> 最后更新：2026-09-15（v0.5.0，M5 完成）
+> 最后更新：2026-09-15（v0.5.0，M5 收尾 + 设计稿核对）
 > 新会话恢复先读本文件 + README.md + docs/ 下三份计划文档
 
 ## 一、项目状态
@@ -49,6 +49,11 @@
    - 设置页按 C 组裁剪：AList/WebDAV/SMB/账户 4 入口已隐藏（不做假功能）
    - EmbyFragment/LibraryGridFragment 详情跳转改回 DetailFragment；MainActivity 搜索/设置入口恢复真实跳转
    - ⚠️ **遗留问题**：详情页"立即播放"点按未进播放器（CENTER 键在盒子焦点上不触发点击，tap 也未生效，待查；播放内核本身 M2 已验证可播）
+
+**13. ✅ M5 收尾 + 设计稿核对（v0.5.0，2026-09-15）**：
+   - **详情页跳转问题已解决**：之前 tap (256,395) 落到的是首页 Hero 上的"立即播放"按钮（设计稿不应有！见差异 H1），实际详情页按钮坐标 (92,441)-(236,485) 中心 (164,463)。tap 后正确进入 PlayerActivity（logcat `Displayed com.starcinema/.view.PlayerActivity`）
+   - **设计稿 vs 实装差异核对**：docs/design-vs-implementation.md（9 大项 31 子项，P1 必做 2 项 / P2 应做 5 项 / P3 打磨 4 项）
+   - **小技巧**：调试时用 `uiautomator dump` 取真实坐标；盒子屏保 `pm disable-user com.xiaomi.mitv.hyper.screensaver` + `pm disable-user com.mitv.tvhome` 防止抢前台
    - ✅ **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
 ## 三、待办（下一步）
