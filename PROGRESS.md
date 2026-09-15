@@ -26,6 +26,7 @@
    - design-actor-works.md（演员作品页：金边头像 + 作品年表横排 + 焦点标题变金）
    - design-search.md（搜索页：大胶囊搜索框 + 热门标签 + 大家都在看）
    - design-player.md（播放界面页：金进度条 + 11 按钮排 + 字幕大小面板）
+7. ✅ **EmbyTV 工作区快照提取** port/embytv/（v0.0.9，784 文件）：旧项目 git 最后提交停 v1.3.43 而工作区已 v1.3.66，108 个未提交文件保底；含内核/API/工具/播放页/全部 res 资源/jniLibs .so/构建配置；109MB MPV AAR 本地保留不入 git（.gitignore 已排除 *.aar）
 
 ## 三、待办（下一步）
 
