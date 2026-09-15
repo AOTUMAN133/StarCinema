@@ -360,12 +360,12 @@ class EmbyFragment : Fragment() {
             ?: client.getImageUrl(baseUrl, bgItemId, item.imageTags?.get("Thumb"), apiKey, 1200, "Thumb")
             ?: client.getImageUrl(baseUrl, bgItemId, item.imageTags?.get("Primary"), apiKey, 1200)
         if (bgUrl != null) {
-            // 底层：小图拉伸天然模糊铺满（填满超宽 Hero 卡，避免裸黑边）
+            // 底层：完整图 centerCrop 全宽铺满（兜底,确保超宽 Hero 无黑边）+ 上层覆盖渐变暗化
             binding.heroBackgroundBlur.animate().alpha(0f).setDuration(150).withEndAction {
-                EmbyImageLoader.loadSmall(binding.heroBackgroundBlur, bgUrl)
+                EmbyImageLoader.load(binding.heroBackgroundBlur, bgUrl)
                 binding.heroBackgroundBlur.animate().alpha(1f).setDuration(300).start()
             }.start()
-            // 上层：完整剧照 fitCenter 居中（不切割，16:9 原图完整显示）
+            // 上层：完整剧照 fitCenter 居中（不切割,16:9 原图完整显示）
             binding.heroBackground.animate().alpha(0f).setDuration(150).withEndAction {
                 EmbyImageLoader.load(binding.heroBackground, bgUrl)
                 binding.heroBackground.animate().alpha(1f).setDuration(300).start()

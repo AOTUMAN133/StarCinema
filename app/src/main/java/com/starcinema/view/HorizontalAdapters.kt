@@ -74,8 +74,8 @@ class HorizontalItemAdapter(
             else -> R.layout.item_poster_card
         }
         val view = LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
-        // 首页行由 DpadRecyclerView 的 itemSpacing 统一控制间距，清掉 item 自带 marginEnd
-        // （否则 DpadRecyclerView 1.5.0-beta01 会把首项 marginEnd 算进宽度，导致第一张窄 20px）
+        // 🔴 首项 marginStart=24,末项 marginEnd=24（用 onBindViewHolder 动态加,因为 RecyclerView 不知末项）
+        //    DpadRecyclerView itemSpacing 控制中间间距
         (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { it.marginEnd = 0; it.marginStart = 0 }
         return ViewHolder(view)
     }
@@ -84,6 +84,12 @@ class HorizontalItemAdapter(
         val ctx = holder.itemView.context
         val scale = FocusStyleHelper.scaleMultiplier(ctx)
         val hidden = FocusStyleHelper.hidden(ctx)
+        // 🔴 首项 marginStart=24,末项 marginEnd=24(对齐 Hero 边距);中间 item 由 itemSpacing 控制
+        val lp = holder.itemView.layoutParams as? ViewGroup.MarginLayoutParams
+        val px = (24 * ctx.resources.displayMetrics.density).toInt()
+        if (position == 0) lp?.marginStart = px
+        if (position == items.size - 1) lp?.marginEnd = px
+        lp?.let { holder.itemView.layoutParams = it }
         if (position == items.size) {
             // "查看全部"卡片 — 布局不同，没有 posterImage/titleText
             holder.itemView.setOnClickListener { onSeeAll?.invoke() }

@@ -39,6 +39,8 @@ class VideoTypeRecyclerAdapterDiff : ListAdapter<VideoType, RecyclerView.ViewHol
         rh.box.visibility = if (videoType.see) View.VISIBLE else View.GONE
         // 行内横向列表用 DpadRecyclerView — 自动处理 TV 焦点，无需 EdgeLockLayoutManager
         rh.videoList.setAdapter(videoType.adapter)
+        // 🔴 DpadRecyclerView 1.5.0 必调用 setSelectedPosition 才能把焦点交给 item（否则按方向键不响应）
+        rh.videoList.setSelectedPosition(0)
         // 标题点击回调（如"查看全部"）：显示"更多 >"并可聚焦点击
         videoType.onTitleClick?.let { click ->
             rh.title.isFocusable = true
@@ -48,6 +50,14 @@ class VideoTypeRecyclerAdapterDiff : ListAdapter<VideoType, RecyclerView.ViewHol
             rh.moreText.setOnClickListener { click() }
             // 焦点链：行标题 → 更多> → 海报行（防止几何搜索乱跳到 Hero）
             rh.moreText.nextFocusRightId = R.id.videoList
+            rh.moreText.nextFocusLeftId = R.id.titleText
+            // 标题/更多 视觉聚焦反馈
+            rh.title.setOnFocusChangeListener { v, hasFocus ->
+                rh.title.setTextColor(v.context.getColor(if (hasFocus) com.starcinema.R.color.star_gold else android.R.color.white))
+            }
+            rh.moreText.setOnFocusChangeListener { v, hasFocus ->
+                rh.moreText.setTextColor(v.context.getColor(if (hasFocus) com.starcinema.R.color.star_gold else com.starcinema.R.color.star_text_secondary))
+            }
         } ?: run {
             rh.moreText.visibility = View.GONE
         }

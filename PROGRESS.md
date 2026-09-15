@@ -66,14 +66,14 @@
    - ⏳ **P3-⑧⑨ 剧集/演员作品/搜索/设置页真机验证**：代码完整，需真服务器数据（用户在自己服务器上验收）
    - **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
-**19. ✅ 首页六问题深度修复（v0.8.0，2026-09-15，用户盒子实测反馈 + 深度分析）**：
-   - **① Hero 仍是剧照（非宽幅背景图）——根本原因**：Emby 协议里 backdrop 的 tag 在 `backdropImageTags: List<String>` 独立字段（不是 `imageTags` map），之前所有修复都在错的字段上找。修复=`item.backdropImageTags?.firstOrNull()` 作 tag 调 getBackdropUrl（EmbyFragment.kt showHero）
-   - **② 顶部导航/更多 仍无法聚焦——根本原因**：导航项 focusable=true，但**没有任何聚焦视觉反馈**，文字/图标始终灰色，用户看不到焦点。修复=MainActivity 添加三个导航项的 onFocusChangeListener：聚焦时图标/文字变金色（star_gold）
-   - **③ 抽屉媒体库点击仍无反应——根本原因**：onClick 用 `bindingAdapterPosition` 在 RecyclerView 动画/ItemDecoration 状态下可能返回 `NO_POSITION=-1`。修复=SidebarAdapter.onBindViewHolder 中捕获 item 本身,安全 fallback
-   - **④ 下移再上移 Hero 与内容行间距消失——根本原因**：fragment_emby 根布局 `animateLayoutChanges="true"` + `homeContent` 加 `nextFocusUp=@id/mediaSourceList` 的焦点 hack,触发 ConstraintLayout 在滚动时重计算 margin。修复=去除 animateLayoutChanges、去除所有焦点 hack 属性;RecyclerView 加固定 paddingTop=16dp 保证上下滚动后间距不变
-   - **⑤ 热门推荐不在 Hero 宽度内——根本原因**：item_poster_card 自带 marginEnd=10dp 与 RecyclerView itemSpacing=10dp 重复计算,首张被推出 20dp。修复=item marginEnd=0,由 RecyclerView itemSpacing 统一管理;paddingStart/End=24 与 Hero 对齐
-   - **⑥ 抽屉"按左就弹"——根本原因**：isFocusAtLeftEdge 用 `adapter position ≤ 0` 判断,position0 的 item 任何时候按左都触发。修复=判断 `itemView.left ≤ videoList.paddingStart`(屏幕可视最左);用户焦点在行标题/更多 时按左不再弹抽屉
-   - 🔴 根因总结：6 个问题里前 5 个都涉及字段名/视觉反馈缺失/RecyclerView 边界判断错误——**之前表面修复都绕过了根本**
+**20. ✅ 首页六问题深度修复第二轮（v0.8.1，2026-09-15，用户盒子实测反馈+根因再分析）**：
+   - **⑤ 导航栏不出现——根本原因**：topNavBar `layout_height="wrap_content"` + 没有 `app:layout_constraintBottom_toBottomOf` 约束 → ConstraintLayout 计算子 View 时给 nav_menu_btn/nav_search 等子 View 高度 = 0,整个顶部栏塌陷!修复=topNavBar 固定 `layout_height="56dp"`(activity_main.xml)
+   - **① 右移跳 Hero**：(⑤) 的直接副作用,导航栏塌陷后 nav_search/nav_settings 不在 view tree,焦点系统按几何搜索只能跳到最近 focusable View=bannerArea。修 ⑤ 同步修 ①
+   - **② Hero 海报仍错**：(0.8.0 已修 backdropImageTags 但装包时 v0.7.1 旧 Hero 仍跑)。修复=底层改用 `EmbyImageLoader.load` 完整图 centerCrop 全宽铺满(不再是 160px 拉伸的模糊)
+   - **③ 热门推荐/继续观看右边没对齐**——根本原因:paddingStart/End=24 + 不可见 marginEnd=0 → 实际是 item 自身无外边距,RecyclerView itemSpacing 不在末项后插入。修复=Adapter 动态给**首项加 marginStart=24,末项加 marginEnd=24**(HorizontalAdapters.kt onBindViewHolder)
+   - **④ 热门推荐"更多"无法聚焦**：(⑤) 导航塌陷导致焦点系统混乱的连锁问题。修复=moreText 显式 `nextFocusLeftId=@id/titleText` + `nextFocusRightId=@id/videoList`,双向焦点链明确;并加聚焦变金色反馈
+   - **⑥ 继续观看往下按焦点消失**——根本原因:DpadRecyclerView 1.5.0-beta01 必须 `setSelectedPosition(0)` 才会把焦点委托给 item,否则按方向键焦点可能丢失。修复=VideoTypeRecyclerAdapterDiff.onBindViewHolder 中调用 `rh.videoList.setSelectedPosition(0)`
+   - 🔴 根因总结：本轮修复发现 ⑤ 才是系列问题的**核心**,顶部栏塌陷导致整个焦点系统崩溃(①/④ 都被它牵连);只有从根上修约束/层级,焦点系统才能正常工作
 
 - ⚠️ 遗留：用户反馈"下移再上移回到最初位置" 待复现验证
 

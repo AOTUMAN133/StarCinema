@@ -69,8 +69,8 @@
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
         app:dpadRecyclerViewItemSpacing="10dp" />
 
 </LinearLayout>
