@@ -281,14 +281,7 @@ class LibraryGridFragment : Fragment() {
     }
 
     private fun openDetail(item: EmbyItem) {
-        // M5 前详情页未实现：直接进播放页
-        val intent = android.content.Intent(requireContext(), com.starcinema.view.PlayerActivity::class.java).apply {
-            putExtra("itemId", item.id)
-            putExtra("title", item.name)
-            putExtra("embyBaseUrl", baseUrl)
-            putExtra("embyApiKey", apiKey)
-        }
-        startActivity(intent)
+        DetailFragment.open(requireActivity().supportFragmentManager, item)
     }
 
     override fun onDestroyView() {

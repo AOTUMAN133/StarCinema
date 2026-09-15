@@ -10,6 +10,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.viewpager2.widget.ViewPager2
 import com.starcinema.view.EmbyFragment
 import com.starcinema.view.MyPageAdapter
+import com.starcinema.view.SearchFragment
+import com.starcinema.view.SettingsFragment
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -140,10 +142,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openSearch() {
-        // M5 搜索页
+        val fm = supportFragmentManager
+        if (fm.findFragmentById(R.id.nav_host_container) is SearchFragment) return
+        fm.beginTransaction()
+            .replace(R.id.nav_host_container, SearchFragment())
+            .addToBackStack("search")
+            .commitAllowingStateLoss()
     }
 
     private fun openSettings() {
-        // M5 设置页
+        val fm = supportFragmentManager
+        if (fm.findFragmentById(R.id.nav_host_container) is SettingsFragment) return
+        fm.beginTransaction()
+            .replace(R.id.nav_host_container, SettingsFragment())
+            .addToBackStack("settings")
+            .commitAllowingStateLoss()
+        // 确保设置页获得焦点
+        fm.executePendingTransactions()
+        fm.findFragmentById(R.id.nav_host_container)?.view?.post {
+            fm.findFragmentById(R.id.nav_host_container)?.view?.requestFocus()
+        }
     }
 }

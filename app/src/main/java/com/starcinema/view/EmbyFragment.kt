@@ -61,8 +61,11 @@ class EmbyFragment : Fragment() {
             val fm = requireActivity().supportFragmentManager
             if (fm.backStackEntryCount == 0) {
                 // 返回栈已清空 → 回到首页
-                // M5 前详情页未实现，无收藏变更逻辑
-                if (!::adapter.isInitialized || adapter.itemCount == 0) {
+                // 详情页改过收藏 → 刷新收藏行（重新加载首页数据）
+                if (DetailFragment.favoriteChanged) {
+                    DetailFragment.favoriteChanged = false
+                    loadHomeData()
+                } else if (!::adapter.isInitialized || adapter.itemCount == 0) {
                     // 🔴 首次添加服务器后返回：adapter 无数据（首启 server==null 走了设置页，
                     //    从未 loadHomeData）→ 必须主动加载，否则首页黑屏（ViewPager2 Fragment
                     //    不会收 onResume，只能靠这里兜底）
@@ -170,8 +173,18 @@ class EmbyFragment : Fragment() {
             when (item) {
                 is SidebarItem.Entry -> when (item.key) {
                     "home" -> { /* 已在首页 */ }
-                    "search" -> { /* M5 搜索页 */ }
-                    "settings" -> { /* M5 设置页 */ }
+                    "search" -> {
+                        requireActivity().supportFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_container, SearchFragment())
+                            .addToBackStack("home")
+                            .commitAllowingStateLoss()
+                    }
+                    "settings" -> {
+                        requireActivity().supportFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_container, SettingsFragment())
+                            .addToBackStack("home")
+                            .commitAllowingStateLoss()
+                    }
                 }
                 is SidebarItem.Lib -> openLibrary(item.lib)
             }
@@ -591,14 +604,7 @@ class EmbyFragment : Fragment() {
             val pos = ha.items.indexOfFirst { it.id == item.id }
             if (pos >= 0) { lastClickedRow = i; lastClickedItem = pos; break }
         }
-        // M5 前详情页未实现：直接进播放页（更完整链路）
-        val intent = android.content.Intent(requireContext(), com.starcinema.view.PlayerActivity::class.java).apply {
-            putExtra("itemId", item.id)
-            putExtra("title", item.name)
-            putExtra("embyBaseUrl", baseUrl)
-            putExtra("embyApiKey", apiKey)
-        }
-        startActivity(intent)
+        DetailFragment.open(requireActivity().supportFragmentManager, item, "home")
     }
 
     private fun buildRows(libs: List<EmbyLibrary>, resumeItems: List<EmbyItem>, latest: List<Pair<EmbyLibrary, List<EmbyItem>>>) {

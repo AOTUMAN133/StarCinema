@@ -1,6 +1,6 @@
 # 星空影院 StarCinema — 进度存档
 
-> 最后更新：2026-09-15（v0.1.0，M1 完成）
+> 最后更新：2026-09-15（v0.5.0，M5 完成）
 > 新会话恢复先读本文件 + README.md + docs/ 下三份计划文档
 
 ## 一、项目状态
@@ -43,6 +43,12 @@
    - LibraryGridFragment：大标题 + 筛选标签（全部/最新/高分/年份▾/类型▾）+ **3×4 海报网格**（无角标、评分纯数字金色、卡内标题白）——对齐 design-media-library.md 定稿
    - 修复 GridAdapter 引用已删除角标导致的崩溃（item_grid_card.xml 按定稿已删 unwatchedBadge）
    - ✅ **小米盒子真机验证通过**：动画库 3×4 网格、筛选标签齐全（选中金色胶囊）、标题+评分显示正常
+12. ✅ **M5 详情/搜索/设置页接入完成**（v0.5.0，编译通过，真机部分验证）：
+   - DetailFragment（详情页，963 行）+ PersonWorksFragment（演员作品页）——详情页真机验证通过：全屏背景+金标题+元数据+简介+立即播放/收藏/更多+IMDb/TMDB/Trakt+主演圆头像+相关推荐
+   - SearchFragment + SearchResultAdapter（搜索页）；SettingsFragment + ServerList/ServerEdit/GeneralSettings/PlaySettings/FocusSettings/About 子页
+   - 设置页按 C 组裁剪：AList/WebDAV/SMB/账户 4 入口已隐藏（不做假功能）
+   - EmbyFragment/LibraryGridFragment 详情跳转改回 DetailFragment；MainActivity 搜索/设置入口恢复真实跳转
+   - ⚠️ **遗留问题**：详情页"立即播放"点按未进播放器（CENTER 键在盒子焦点上不触发点击，tap 也未生效，待查；播放内核本身 M2 已验证可播）
    - ✅ **编译通过**：app-arm64-v8a-debug.apk + app-armeabi-v7a-debug.apk（各 ~52MB）
 
 ## 三、待办（下一步）
