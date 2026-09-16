@@ -78,15 +78,10 @@
                     android:id="@+id/itemTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/gold_primary"
+                    style="@style/HeadingGold"
                     android:textSize="36sp"
-                    android:textStyle="bold"
                     android:maxLines="2"
-                    android:ellipsize="end"
-                    android:shadowColor="#80000000"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="4" />
+                    android:ellipsize="end" />
 
                 <View
                     android:layout_width="64dp"

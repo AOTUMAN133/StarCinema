@@ -19,6 +19,14 @@
         <item name="android:navigationBarColor">@color/bg_primary</item>
     </style>
 
+    <!-- H1 金色书法大标题（设计文档 v1.0：Noto Serif SC / 40px / Bold / 金色渐变） -->
+    <style name="HeadingGold">
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/gold_primary</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
     <!-- 热门搜索标签（胶囊，聚焦金色实心） -->
     <style name="HotWordTag">
         <item name="android:layout_width">wrap_content</item>

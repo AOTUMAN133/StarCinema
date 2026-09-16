@@ -225,11 +225,7 @@
                         android:textStyle="bold"
                         android:fontFamily="serif"
                         android:maxLines="1"
-                        android:ellipsize="end"
-                        android:shadowColor="#80000000"
-                        android:shadowDx="1"
-                        android:shadowDy="1"
-                        android:shadowRadius="4" />
+                        android:ellipsize="end" />
 
                     <TextView
                         android:id="@+id/bannerOverview"

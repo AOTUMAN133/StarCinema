@@ -151,7 +151,7 @@ class DetailFragment : Fragment() {
             if (!people.isNullOrEmpty()) {
                 binding.castSection.visibility = View.VISIBLE
                 binding.castRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                binding.castRecyclerView.adapter = CastAdapter(people.take(20), baseUrl, apiKey, client) { p ->
+                binding.castRecyclerView.adapter = CastAdapter(people.take(4), baseUrl, apiKey, client) { p ->
                     openPersonWorks(p)
                 }
             }

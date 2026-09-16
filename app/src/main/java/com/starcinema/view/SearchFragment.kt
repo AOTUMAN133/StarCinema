@@ -57,11 +57,23 @@ class SearchFragment : Fragment() {
             binding.hotWord1, binding.hotWord2, binding.hotWord3,
             binding.hotWord4, binding.hotWord5, binding.hotWord6
         )
+        var selectedTag: android.widget.TextView? = null
         hotWords.forEach { tv ->
             tv.setOnClickListener {
                 val word = tv.text.toString()
                 binding.searchEdit.setText(word)
                 binding.searchEdit.setSelection(word.length)
+                // 选中态常驻：金色实心 + 火焰
+                selectedTag?.let { prev ->
+                    prev.setBackgroundResource(R.drawable.bg_tag_idle)
+                    prev.setTextColor(prev.context.getColor(R.color.text_secondary))
+                    prev.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                }
+                tv.setBackgroundResource(R.drawable.bg_sidebar_focus)
+                tv.setTextColor(tv.context.getColor(R.color.bg_primary))
+                tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_fire, 0, 0, 0)
+                tv.compoundDrawablePadding = 6
+                selectedTag = tv
                 doSearch()
             }
             tv.setOnKeyListener { v, keyCode, event ->
@@ -70,6 +82,7 @@ class SearchFragment : Fragment() {
                 ) { v.performClick(); true } else false
             }
             tv.setOnFocusChangeListener { v, hasFocus ->
+                if (v === selectedTag) return@setOnFocusChangeListener // 选中态不随焦点变化
                 v.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else R.drawable.bg_tag_idle)
                 (v as android.widget.TextView).setTextColor(
                     if (hasFocus) v.context.getColor(R.color.bg_primary)
