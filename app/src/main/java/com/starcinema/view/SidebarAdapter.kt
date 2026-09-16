@@ -105,6 +105,17 @@ class SidebarAdapter(
             val safeItem = if (pos != RecyclerView.NO_POSITION) getItem(pos) else item
             onClick(safeItem)
         }
+        // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        holder.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
     }
 }
 

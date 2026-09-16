@@ -53,7 +53,7 @@
                     android:id="@+id/itemTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="@color/star_gold"
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:maxLines="2"
@@ -166,7 +166,7 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <!-- 简介（3行，可聚焦，focus 下到播放按钮） -->
+            <!-- 简介（2行，星光影院设计文档 v1.0：m4 简介 2 行） -->
             <TextView
                 android:id="@+id/overviewText"
                 android:layout_width="match_parent"
@@ -176,7 +176,7 @@
                 android:paddingBottom="4dp"
                 android:textColor="@color/white"
                 android:textSize="22sp"
-                android:maxLines="3"
+                android:maxLines="2"
                 android:ellipsize="end"
                 android:focusable="true"
                 android:nextFocusDown="@+id/actionBtnContainer"
@@ -399,16 +399,49 @@
             </LinearLayout>
 
 
-            <!-- 媒体信息 -->
+            <!-- 媒体信息：视频/音频/字幕 三卡横排（星光影院 v1.0 暗金风格） -->
             <LinearLayout
-                android:id="@+id/mediaInfoCard"
+                android:id="@+id/mediaInfoRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:background="@drawable/btn_select_focused_circle_no"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:visibility="gone" />
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <!-- 视频卡 -->
+                <LinearLayout
+                    android:id="@+id/videoInfoCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_media_info_card"
+                    android:orientation="vertical"
+                    android:padding="16dp" />
+
+                <!-- 音频卡 -->
+                <LinearLayout
+                    android:id="@+id/audioInfoCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_media_info_card"
+                    android:orientation="vertical"
+                    android:padding="16dp" />
+
+                <!-- 字幕卡 -->
+                <LinearLayout
+                    android:id="@+id/subtitleInfoCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_media_info_card"
+                    android:orientation="vertical"
+                    android:padding="16dp" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

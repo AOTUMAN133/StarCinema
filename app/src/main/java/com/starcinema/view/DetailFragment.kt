@@ -22,6 +22,25 @@ import com.starcinema.app.PreferencesHelper
 import com.starcinema.databinding.FragmentDetailBinding
 import kotlinx.coroutines.launch
 
+// 本地解析辅助（EmbyClient.kt 的同名函数是 private，跨文件不可见）
+private fun toInt(value: Any?): Int? = when (value) {
+    is Number -> value.toInt()
+    is String -> value.toDoubleOrNull()?.toInt()
+    else -> null
+}
+
+private fun toLong(value: Any?): Long? = when (value) {
+    is Number -> value.toLong()
+    is String -> value.toLongOrNull()
+    else -> null
+}
+
+private fun toFloat(value: Any?): Float? = when (value) {
+    is Number -> value.toFloat()
+    is String -> value.toFloatOrNull()
+    else -> null
+}
+
 class DetailFragment : Fragment() {
 
     companion object {
@@ -163,7 +182,7 @@ class DetailFragment : Fragment() {
                         binding.recommendRecyclerView.adapter = SimplePosterAdapter(
                             sim, baseUrl, apiKey, client,
                             onClick = { item -> openDetail(item.id) },
-                            layoutResId = R.layout.item_detail_card
+                            layoutResId = R.layout.item_detail_landscape
                         )
                     }
                 }
@@ -265,17 +284,13 @@ class DetailFragment : Fragment() {
             binding.externalLinksRow.visibility = View.VISIBLE
         }
 
-        // 评分行：评分 / 年份 / 时长 / 分辨率 / 类型标签 / 季号
+        // 评分行：评分 / 年份 / 时长（设计文档 v1.0：元信息行 年份·时长·★评分，去 [R] 分级与类型标签）
         binding.infoRow.visibility = View.VISIBLE
         if (detail.communityRating != null) {
             binding.ratingText.visibility = View.VISIBLE
             binding.ratingText.text = "★ ${"%.1f".format(detail.communityRating!!)}"
         }
-        // 认证分级（OfficialRating: PG-13 / R / TV-MA 等）
-        if (!detail.officialRating.isNullOrBlank()) {
-            binding.officialRatingText.visibility = View.VISIBLE
-            binding.officialRatingText.text = detail.officialRating
-        }
+        // 星光影院 v1.0：官方分级([R]/PG-13 等)不属于设计稿元信息行 → 保持 hidden
         if (detail.productionYear != null) {
             binding.yearText.visibility = View.VISIBLE
             binding.yearText.text = detail.productionYear.toString()
@@ -287,25 +302,7 @@ class DetailFragment : Fragment() {
             binding.runtimeText.text = "${runtimeMin} 分钟"
             binding.metaSep2.visibility = View.VISIBLE
         }
-        // 类型标签（genres → chips）
-        if (!detail.genres.isNullOrEmpty()) {
-            binding.genreRow.visibility = View.VISIBLE
-            binding.genreRow.removeAllViews()
-            detail.genres!!.forEach { genre ->
-                val chip = TextView(requireContext()).apply {
-                    text = genre
-                    setTextColor(resources.getColor(R.color.apple_text_secondary, null))
-                    textSize = 12f
-                    setPadding(10, 4, 10, 4)
-                    setBackgroundResource(R.drawable.btn_select_circle)
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply { marginEnd = 6 }
-                }
-                binding.genreRow.addView(chip)
-            }
-        }
-
+        // 星光影院 v1.0：类型标签(genre chips)不属于设计稿元信息行 → 保持 hidden
         // 季号（剧集详情时）
         if (detail.type == "Season" && detail.parentIndexNumber != null) {
             binding.seasonNumber.visibility = View.VISIBLE
@@ -411,111 +408,185 @@ class DetailFragment : Fragment() {
         }
     }
 
-    /** 媒体信息卡：视频/音频/字幕（独立方法，剧集页用选集流信息重刷） */
+    /** 媒体信息：视频卡/音频卡/字幕卡 三卡横排（星光影院 v1.0 暗金风格，来自 MediaStreams 全量） */
     private fun bindMediaInfo(detail: EmbyItem) {
         try {
-            binding.mediaInfoCard.visibility = View.VISIBLE
-            binding.mediaInfoCard.removeAllViews()
-            fun addInfo(label: String, value: String) {
-                val row = LinearLayout(requireContext()).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply { setMargins(0, 0, 0, 4) }
-                    addView(TextView(requireContext()).apply {
-                        text = label
-                        setTextColor(resources.getColor(R.color.apple_text_tertiary, null))
-                        textSize = 12f
-                        layoutParams = LinearLayout.LayoutParams(70.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT)
-                    })
-                    addView(TextView(requireContext()).apply {
-                        text = value
-                        setTextColor(resources.getColor(R.color.apple_text_secondary, null))
-                        textSize = 14f
-                    })
-                }
-                binding.mediaInfoCard.addView(row)
-            }
-            addInfo("类型", detail.type ?: "")
-            addInfo("年份", detail.productionYear?.toString() ?: "")
-            val runtime = detail.runTimeTicks?.let { it / 600000000 }
-            if (runtime != null && runtime > 0) addInfo("时长", "${runtime} 分钟")
+            binding.mediaInfoRow.visibility = View.VISIBLE
+            binding.videoInfoCard.removeAllViews()
+            binding.audioInfoCard.removeAllViews()
+            binding.subtitleInfoCard.removeAllViews()
 
-            // 分辨率/视频编码（MediaStreams 解析）
+            // 优先取 MediaSources 里的原始流列表（含声道/采样率/语言/外挂等全量字段）
+            val ms = detail.mediaSources?.firstOrNull()
+            val rawStreams = ms?.mediaStreams ?: emptyList()
+            val videoStream = rawStreams.firstOrNull { it["Type"] == "Video" }
+            val audioStreams = rawStreams.filter { it["Type"] == "Audio" }
+            val subtitleStreams = rawStreams.filter { it["Type"] == "Subtitle" }
+            // 兜底：PlaybackInfo 概要（详情接口没返回 MediaStreams 时）
             val stream = detail.videoStreamInfo
-            if (stream != null) {
-                val resolution = if (stream.width != null && stream.height != null) {
-                    when {
-                        stream.height!! >= 2160 -> "4K"
-                        stream.height!! >= 1080 -> "1080p"
-                        stream.height!! >= 720 -> "720p"
-                        else -> "${stream.height}p"
-                    }
-                } else null
-                val codecLabel = stream.codec?.let { it.uppercase(java.util.Locale.US) }
-                val hdrLabel = stream.profile?.let { p ->
-                    when {
-                        p.contains("HDR10+") -> "HDR10+"
-                        p.contains("HDR10") -> "HDR10"
-                        p.contains("Dolby Vision") || p.contains("DV") -> "DV"
-                        p.contains("HLG") -> "HLG"
+
+            // ===== 视频卡 =====
+            val hasVideo = videoStream != null || (stream != null && stream.codec != null)
+            if (hasVideo) {
+                addCardTitle(binding.videoInfoCard, "视频")
+                val vs = videoStream
+                if (vs != null) {
+                    val res = when {
+                        toInt(vs["Height"]) != null && toInt(vs["Height"])!! >= 2160 -> "4K"
+                        toInt(vs["Height"]) != null && toInt(vs["Height"])!! >= 1080 -> "1080p"
+                        toInt(vs["Height"]) != null && toInt(vs["Height"])!! >= 720 -> "720p"
+                        toInt(vs["Height"]) != null -> "${toInt(vs["Height"])}p"
                         else -> null
                     }
+                    addInfoRow(binding.videoInfoCard, "编码", (vs["Codec"] as? String)?.uppercase(java.util.Locale.US))
+                    addInfoRow(binding.videoInfoCard, "分辨率", res)
+                    val fps = toFloat(vs["RealFrameRate"]) ?: toFloat(vs["AverageFrameRate"])
+                    addInfoRow(binding.videoInfoCard, "帧率", fps?.let { "%.0f fps".format(it) })
+                    val br = toLong(vs["BitRate"]) ?: toLong(vs["Bitrate"])
+                    addInfoRow(binding.videoInfoCard, "码率", br?.let { String.format("%.1f Mbps", it / 1000000.0) })
+                    (vs["Profile"] as? String)?.let { p ->
+                        val hdr = when {
+                            p.contains("HDR10+") -> "HDR10+"
+                            p.contains("HDR10") -> "HDR10"
+                            p.contains("Dolby Vision") || p.contains("DV") -> "DV"
+                            p.contains("HLG") -> "HLG"
+                            else -> null
+                        }
+                        addInfoRow(binding.videoInfoCard, "范围", hdr)
+                    }
+                } else {
+                    val res = if (stream?.height != null) {
+                        when {
+                            stream.height!! >= 2160 -> "4K"; stream.height!! >= 1080 -> "1080p"
+                            stream.height!! >= 720 -> "720p"; else -> "${stream.height}p"
+                        }
+                    } else null
+                    addInfoRow(binding.videoInfoCard, "编码", stream?.codec?.uppercase(java.util.Locale.US))
+                    addInfoRow(binding.videoInfoCard, "分辨率", res)
+                    stream?.frameRate?.let { addInfoRow(binding.videoInfoCard, "帧率", "%.0f fps".format(it)) }
+                    stream?.bitRate?.let { addInfoRow(binding.videoInfoCard, "码率", String.format("%.1f Mbps", it / 1000000.0)) }
                 }
-                val infoParts = listOfNotNull(resolution, codecLabel, hdrLabel)
-                if (infoParts.isNotEmpty()) addInfo("视频", infoParts.joinToString(" "))
-                // 音频轨：AC3 5.1 / EAC3 等
-                if (stream.audioStreams.isNotEmpty()) {
-                    addInfo("音频", stream.audioStreams.map { it.uppercase(java.util.Locale.US) }.joinToString(" "))
-                }
-                // 字幕轨数量
-                if (stream.subtitleStreams > 0) {
-                    addInfo("字幕", "${stream.subtitleStreams} 条")
-                }
+            } else {
+                binding.videoInfoCard.visibility = View.GONE
             }
 
-            // ====== 媒体文件信息（来自 MediaSources，对齐 AfuseKtV）======
-            val ms = detail.mediaSources?.firstOrNull()
-            if (ms != null) {
-                // 容器格式
-                if (!ms.container.isNullOrBlank()) {
-                    addInfo("容器", ms.container.uppercase(java.util.Locale.US))
-                }
-                // 文件大小（字节 → GB）
-                ms.size?.let { size ->
-                    if (size > 0) {
-                        val gb = size / (1024.0 * 1024.0 * 1024.0)
-                        addInfo("大小", if (gb >= 1) String.format("%.2f GB", gb) else "${size / (1024.0 * 1024.0)} MB")
+            // ===== 音频卡 =====
+            if (audioStreams.isNotEmpty() || (stream?.audioStreams?.isNotEmpty() == true)) {
+                addCardTitle(binding.audioInfoCard, "音频")
+                val audios = if (audioStreams.isNotEmpty()) audioStreams else emptyList()
+                val fallbackCodecs = stream?.audioStreams ?: emptyList()
+                if (audios.isNotEmpty()) {
+                    audios.forEachIndexed { i, a ->
+                        val codec = (a["Codec"] as? String)?.uppercase(java.util.Locale.US)
+                        val ch = toInt(a["Channels"])
+                        val lang = (a["Language"] as? String)?.let { it.uppercase(java.util.Locale.US) }
+                        val display = (a["DisplayTitle"] as? String)?.trim()
+                        val title = if (lang != null) "$codec · $lang" else codec
+                        addInfoRow(binding.audioInfoCard,
+                            if (audios.size > 1) "音轨${i + 1}" else "编码",
+                            display ?: title ?: "—")
+                        if (ch != null && ch > 0 && audios.size == 1) {
+                            addInfoRow(binding.audioInfoCard, "声道", when (ch) {
+                                1 -> "单声道"; 2 -> "双声道"; 6 -> "5.1"; 8 -> "7.1"; else -> "$ch 声道"
+                            })
+                        }
                     }
+                } else {
+                    addInfoRow(binding.audioInfoCard, "编码", fallbackCodecs.map { it.uppercase(java.util.Locale.US) }.joinToString(" "))
                 }
-                // 码率（bps → Mbps）
-                ms.bitRate?.let { br ->
-                    if (br > 0) {
-                        addInfo("码率", String.format("%.1f Mbps", br / 1000000.0))
-                    }
-                }
-                // 文件名（Path 末段 或 Name）
-                val fileName = ms.path?.substringAfterLast('/')?.substringAfterLast('\\')
-                    ?: ms.name
-                if (!fileName.isNullOrBlank()) {
-                    addInfo("文件", fileName)
-                }
-                // 来源：Protocol（File/Local/Http）+ 类型
-                val protocol = ms.path?.let { p ->
-                    when {
-                        p.contains("http") -> "网盘/远程"
-                        p.contains("/115") -> "115 网盘"
-                        p.contains("/emby") || p.contains("/media") || p.contains("/volume") -> "NAS"
-                        else -> "本地"
-                    }
-                }
-                if (protocol != null) {
-                    addInfo("来源", protocol)
-                }
+            } else {
+                binding.audioInfoCard.visibility = View.GONE
             }
+
+            // ===== 字幕卡 =====
+            if (subtitleStreams.isNotEmpty() || (stream?.subtitleStreams ?: 0) > 0) {
+                addCardTitle(binding.subtitleInfoCard, "字幕")
+                if (subtitleStreams.isNotEmpty()) {
+                    addInfoRow(binding.subtitleInfoCard, "数量", "${subtitleStreams.size} 条")
+                    subtitleStreams.take(4).forEach { s ->
+                        val lang = (s["Language"] as? String)?.let { it.uppercase(java.util.Locale.US) }
+                            ?: (s["DisplayTitle"] as? String)?.takeIf { it.isNotBlank() }?.substringBefore("(")?.trim()
+                            ?: "未知"
+                        val ext = (s["IsExternal"] as? Boolean) == true
+                        val isDefault = (s["IsDefault"] as? Boolean) == true
+                        val mark = when {
+                            isDefault -> "●"; else -> if (ext) "外挂" else "内嵌"
+                        }
+                        addInfoRow(binding.subtitleInfoCard, "语言", "$lang $mark")
+                    }
+                } else {
+                    addInfoRow(binding.subtitleInfoCard, "数量", "${stream?.subtitleStreams} 条")
+                }
+            } else {
+                binding.subtitleInfoCard.visibility = View.GONE
+            }
+
+            // 全空则隐藏整行
+            val anyVisible = binding.videoInfoCard.visibility == View.VISIBLE ||
+                binding.audioInfoCard.visibility == View.VISIBLE ||
+                binding.subtitleInfoCard.visibility == View.VISIBLE
+            binding.mediaInfoRow.visibility = if (anyVisible) View.VISIBLE else View.GONE
         } catch (e: Exception) {
             // 容错：防止详情渲染闪退
         }
+    }
+
+    /** 三卡标题行：金色小图标 + 金色标题 */
+    private fun addCardTitle(card: LinearLayout, title: String) {
+        val px18 = 18.dpToPx()
+        val px10 = 10.dpToPx()
+        val iconRes = when (title) {
+            "视频" -> R.drawable.ic_action_play_white
+            "音频" -> R.drawable.exo_ic_audiotrack
+            else -> R.drawable.exo_ic_subtitle_on
+        }
+        val row = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = px10 }
+            addView(ImageView(requireContext()).apply {
+                setImageResource(iconRes)
+                setColorFilter(resources.getColor(R.color.star_gold, null), android.graphics.PorterDuff.Mode.SRC_ATOP)
+                layoutParams = LinearLayout.LayoutParams(px18, px18)
+            })
+            addView(TextView(requireContext()).apply {
+                text = title
+                setTextColor(resources.getColor(R.color.star_gold, null))
+                textSize = 16f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+                setPadding(px10, 0, 0, 0)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            })
+        }
+        card.addView(row)
+    }
+
+    /** 三卡信息行：灰色标签 + 白色值 */
+    private fun addInfoRow(card: LinearLayout, label: String, value: String?) {
+        if (value.isNullOrBlank()) return
+        val row = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, 0, 0, 4) }
+            addView(TextView(requireContext()).apply {
+                text = label
+                setTextColor(resources.getColor(R.color.apple_text_tertiary, null))
+                textSize = 12f
+                layoutParams = LinearLayout.LayoutParams(44.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT)
+            })
+            addView(TextView(requireContext()).apply {
+                text = value
+                setTextColor(resources.getColor(R.color.white, null))
+                textSize = 13f
+                setTypeface(null, android.graphics.Typeface.BOLD)
+            })
+        }
+        card.addView(row)
     }
 
     /** 加载某一季的剧集列表 */
@@ -557,7 +628,11 @@ class DetailFragment : Fragment() {
                     if (cur != null && cur.videoStreamInfo == null) {
                         val source = eps.firstOrNull { it.videoStreamInfo != null }
                         if (source != null) {
-                            item = cur.copy(videoStreamInfo = source.videoStreamInfo)
+                            // mediaSources 也要带上（三卡需要完整 MediaStreams 流列表）
+                            item = cur.copy(
+                                videoStreamInfo = source.videoStreamInfo,
+                                mediaSources = source.mediaSources ?: cur.mediaSources
+                            )
                             bindMediaInfo(item!!)
                         }
                     }
@@ -582,6 +657,17 @@ class DetailFragment : Fragment() {
             isClickable = true
             setPadding(24, 12, 24, 12)
             setOnClickListener { launchPlayer(detail) }
+            // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+            setOnKeyListener { v, keyCode, event ->
+                if (event.action == android.view.KeyEvent.ACTION_UP &&
+                    (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                     keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                     keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+                ) {
+                    v.performClick()
+                    true
+                } else false
+            }
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, px40
             ).apply { marginEnd = px8 }
@@ -616,6 +702,17 @@ class DetailFragment : Fragment() {
             isFocusable = true
             isClickable = true
             setOnClickListener { onClick() }
+            // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+            setOnKeyListener { v, keyCode, event ->
+                if (event.action == android.view.KeyEvent.ACTION_UP &&
+                    (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                     keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                     keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+                ) {
+                    v.performClick()
+                    true
+                } else false
+            }
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, px40
             ).apply { marginEnd = px8 }
@@ -797,6 +894,18 @@ class EpisodeAdapter(
         } else ""
         EmbyImageLoader.load(h.image, imageUrls[pos])
         h.itemView.setOnClickListener { onClick(item) }
+        
+        // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        h.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
         h.itemView.onFocusChangeListener = android.view.View.OnFocusChangeListener { v, hasFocus ->
             val card = h.imageBox as? com.google.android.material.card.MaterialCardView
             if (card != null) {
@@ -854,13 +963,26 @@ class SeasonAdapter(
             )
         }
         h.itemView.setOnClickListener { onClick(s) }
+
+        // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        h.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
+
     }
     class ViewHolder(v: android.view.View) : RecyclerView.ViewHolder(v) {
         val text: TextView = v.findViewById(R.id.seasonTabText)
     }
 }
 
-/** 简单海报 RecyclerView 适配器 */
+/** 简单海报 RecyclerView 适配器（横版卡用 Thumb/Backdrop 图源，避免竖版海报被裁切） */
 class SimplePosterAdapter(
     private val items: List<EmbyItem>,
     private val baseUrl: String,
@@ -870,7 +992,17 @@ class SimplePosterAdapter(
     private val onClick: (EmbyItem) -> Unit
 ) : RecyclerView.Adapter<SimplePosterAdapter.ViewHolder>() {
 
-    private val imageUrls = items.map { client.getImageUrl(baseUrl, it.id, it.imageTags?.get("Primary") ?: it.primaryImageTag, apiKey, 320) }
+    private val landscape = layoutResId == R.layout.item_detail_landscape
+    private val imageUrls = items.map { item ->
+        val id = item.id
+        if (landscape) {
+            val tag = item.imageTags?.get("Thumb") ?: item.imageTags?.get("Backdrop") ?: item.imageTags?.get("Primary")
+            if (tag != null) client.getImageUrl(baseUrl, id, tag, apiKey, 480, "Thumb")
+            else client.getBackdropUrl(baseUrl, id, null, apiKey, 480)
+        } else {
+            client.getImageUrl(baseUrl, id, item.imageTags?.get("Primary") ?: item.primaryImageTag, apiKey, 320)
+        }
+    }
 
     override fun getItemCount() = items.size
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -882,9 +1014,25 @@ class SimplePosterAdapter(
         val scale = FocusStyleHelper.scaleMultiplier(h.itemView.context)
         val hidden = FocusStyleHelper.hidden(h.itemView.context)
         h.title.text = item.name
+        // 星光影院：横版卡副标题填年份（设计稿相关推荐规格）
+        if (landscape) {
+            h.subtitle?.text = item.productionYear?.toString() ?: ""
+        }
         // 设计稿：相关推荐无角标
         EmbyImageLoader.load(h.image, imageUrls[pos])
         h.itemView.setOnClickListener { onClick(item) }
+        
+        // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        h.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
         h.itemView.onFocusChangeListener = android.view.View.OnFocusChangeListener { v, hasFocus ->
             val card = h.imageBox as? com.google.android.material.card.MaterialCardView
             if (card != null) {
@@ -903,6 +1051,7 @@ class SimplePosterAdapter(
     class ViewHolder(v: android.view.View) : RecyclerView.ViewHolder(v) {
         val image: ImageView = v.findViewById(R.id.posterImage)
         val title: TextView = v.findViewById(R.id.titleText)
+        val subtitle: TextView? = v.findViewById(R.id.subtitleText)
         val unwatchedBadge: TextView? = null // 设计稿：无角标
         val imageBox: View? = v.findViewById(R.id.imageBox)
     }
@@ -933,6 +1082,17 @@ class CastAdapter(
             EmbyImageLoader.load(h.image, url)
         }
         h.itemView.setOnClickListener { onClick(pos) }
+        // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        h.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
         h.itemView.onFocusChangeListener = android.view.View.OnFocusChangeListener { v, hasFocus ->
             val card = h.imageBox as? com.google.android.material.card.MaterialCardView
             if (card != null) {

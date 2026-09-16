@@ -98,6 +98,17 @@ class HorizontalItemAdapter(
         if (position == items.size) {
             // "查看全部"卡片 — 布局不同，没有 posterImage/titleText
             holder.itemView.setOnClickListener { onSeeAll?.invoke() }
+                    // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        holder.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
             holder.itemView.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
                 if (!hidden) v.animate().translationZ(if (hasFocus) 8f else 0f).setDuration(120).start()
             }
@@ -106,10 +117,8 @@ class HorizontalItemAdapter(
         val item = items[position]
         // 标题：Episode 显示剧集名（seriesName），其他显示原名称
         holder.title?.text = if (item.type == "Episode" && !item.seriesName.isNullOrBlank()) item.seriesName else item.name
-        // 星光影院：标题聚焦时跑马灯（focusableInTouchMode+isFocusable 缺一不可）
-        holder.title?.isFocusable = true
-        holder.title?.isFocusableInTouchMode = true
-        holder.title?.setOnFocusChangeListener { _, hasFocus -> holder.title?.isSelected = hasFocus }
+        // 🔴 星光影院：标题走马灯不能靠 title 自身 focusable（会抢走卡片焦点导致 OK 键失效）——
+        //    由 itemView 焦点联动 isSelected 触发，见下方 onFocusChangeListener
         holder.subtitle?.text = subtitleFor(item)
         // 星光影院：金色评分 ★（有评分才显示）
         val cr = item.communityRating
@@ -142,7 +151,20 @@ class HorizontalItemAdapter(
         }
 
         holder.itemView.setOnClickListener { onClick(item) }
+                // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        holder.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
         holder.itemView.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+            // 星光影院：标题走马灯由卡片焦点联动（title 自身不可 focusable，避免抢焦点）
+            holder.title?.isSelected = hasFocus
             // AfuseKtV 风格：卡片整体缩放+边框，clipChildren=false 保证边框完整
             val card = holder.imageBox as? com.google.android.material.card.MaterialCardView
             if (card != null) {
@@ -246,6 +268,17 @@ class HorizontalLibraryAdapter(
         holder.name.text = lib.name
         EmbyImageLoader.load(holder.image, imageUrls[position])
         holder.itemView.setOnClickListener { onClick(lib) }
+                // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        holder.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
         holder.itemView.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
                     // AfuseKtV 风格：缩放 itemView 整体（左边缘为锚点），默认 clipChildren=true 裁剪溢出
                     if (!hidden) {

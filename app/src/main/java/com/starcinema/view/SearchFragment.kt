@@ -214,11 +214,23 @@ class SearchFragment : Fragment() {
         }
         binding.libraryList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
         binding.libraryList.adapter = sidebarAdapter
+        // 填充固定入口 + 动态媒体库列表（与首页侧栏一致，设计文档 v1.0：9 分类导航）
         val items = mutableListOf<SidebarItem>()
         items.add(SidebarItem.Entry("home", "首页"))
         items.add(SidebarItem.Entry("search", "搜索"))
-        items.add(SidebarItem.Entry("settings", "设置"))
-        sidebarAdapter.submitList(items)
+        if (baseUrl.isNotEmpty()) {
+            lifecycleScope.launch {
+                client.getLibraries(baseUrl, apiKey, userId).onSuccess { libs ->
+                    if (!isAdded || _binding == null) return@onSuccess
+                    libs.forEach { items.add(SidebarItem.Lib(it)) }
+                    items.add(SidebarItem.Entry("settings", "设置"))
+                    sidebarAdapter.submitList(items)
+                }
+            }
+        } else {
+            items.add(SidebarItem.Entry("settings", "设置"))
+            sidebarAdapter.submitList(items)
+        }
     }
 
     private fun openDetail(item: EmbyItem) {

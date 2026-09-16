@@ -44,6 +44,18 @@ class SearchResultAdapter(
         EmbyImageLoader.load(holder.image, imageUrls[position])
 
         holder.itemView.setOnClickListener { onClick(item) }
+        // 🔴 星光影院：OK 键(23/66)不触发 click 的兜底 —— 显式转发 performClick
+        holder.itemView.setOnKeyListener { v, keyCode, event ->
+            if (event.action == android.view.KeyEvent.ACTION_UP &&
+                (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                 keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
+            ) {
+                v.performClick()
+                true
+            } else false
+        }
+
         holder.itemView.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
             // AfuseKtV 风格：缩放 imageBox（海报卡片整体放大+边框），标题不缩放
             val card = holder.imageBox as? com.google.android.material.card.MaterialCardView
