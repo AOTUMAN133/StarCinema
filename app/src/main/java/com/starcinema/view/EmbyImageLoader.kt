@@ -10,6 +10,7 @@ object EmbyImageLoader {
         val request = ImageRequest.Builder(imageView.context)
             .data(url)
             .crossfade(200)
+            .scale(coil.size.Scale.FILL)        // FILL 对应 ImageView scaleType=centerCrop
             .target(imageView)
             .build()
         Coil.imageLoader(imageView.context).enqueue(request)
@@ -22,6 +23,7 @@ object EmbyImageLoader {
             .data(url)
             .size(160)          // 极小尺寸 → 拉伸后自带模糊
             .crossfade(200)
+            .scale(coil.size.Scale.FILL)
             .target(imageView)
             .build()
         Coil.imageLoader(imageView.context).enqueue(request)

@@ -48,7 +48,7 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_logo"
+                    android:src="@drawable/ic_logo_star"
                     android:contentDescription="星光影院" />
 
                 <TextView

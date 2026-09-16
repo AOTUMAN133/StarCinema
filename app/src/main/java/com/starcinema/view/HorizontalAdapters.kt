@@ -74,8 +74,8 @@ class HorizontalItemAdapter(
             else -> R.layout.item_poster_card
         }
         val view = LayoutInflater.from(parent.context).inflate(layoutRes, parent, false)
-        // 🔴 首项 marginStart=24,末项 marginEnd=24（用 onBindViewHolder 动态加,因为 RecyclerView 不知末项）
-        //    DpadRecyclerView itemSpacing 控制中间间距
+        // 🔴 首项 marginStart=20dp,末项 marginEnd=20dp（用 onBindViewHolder 动态加,因为 RecyclerView 不知末项）
+        //    中间 item marginEnd=12dp（设计文档 24px 横向间距）
         (view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { it.marginEnd = 0; it.marginStart = 0 }
         return ViewHolder(view)
     }
@@ -84,11 +84,16 @@ class HorizontalItemAdapter(
         val ctx = holder.itemView.context
         val scale = FocusStyleHelper.scaleMultiplier(ctx)
         val hidden = FocusStyleHelper.hidden(ctx)
-        // 🔴 首项 marginStart=24,末项 marginEnd=24(对齐 Hero 边距);中间 item 由 itemSpacing 控制
+        // 🔴 首项 marginStart=20dp,末项 marginEnd=20dp(对齐 Hero 边距);中间 item marginEnd=12dp(设计文档 24px 横向间距)
         val lp = holder.itemView.layoutParams as? ViewGroup.MarginLayoutParams
-        val px = (24 * ctx.resources.displayMetrics.density).toInt()
-        if (position == 0) lp?.marginStart = px
-        if (position == items.size - 1) lp?.marginEnd = px
+        val edgePx = (20 * ctx.resources.displayMetrics.density).toInt()
+        val midPx = (12 * ctx.resources.displayMetrics.density).toInt()
+        when {
+            position == 0 && items.size == 1 -> { lp?.marginStart = edgePx; lp?.marginEnd = edgePx }
+            position == 0 -> { lp?.marginStart = edgePx; lp?.marginEnd = midPx }
+            position == items.size - 1 -> { lp?.marginStart = midPx; lp?.marginEnd = edgePx }
+            else -> { lp?.marginStart = midPx; lp?.marginEnd = midPx }
+        }
         lp?.let { holder.itemView.layoutParams = it }
         if (position == items.size) {
             // "查看全部"卡片 — 布局不同，没有 posterImage/titleText
@@ -101,6 +106,10 @@ class HorizontalItemAdapter(
         val item = items[position]
         // 标题：Episode 显示剧集名（seriesName），其他显示原名称
         holder.title?.text = if (item.type == "Episode" && !item.seriesName.isNullOrBlank()) item.seriesName else item.name
+        // 星光影院：标题聚焦时跑马灯（focusableInTouchMode+isFocusable 缺一不可）
+        holder.title?.isFocusable = true
+        holder.title?.isFocusableInTouchMode = true
+        holder.title?.setOnFocusChangeListener { _, hasFocus -> holder.title?.isSelected = hasFocus }
         holder.subtitle?.text = subtitleFor(item)
         // 星光影院：金色评分 ★（有评分才显示）
         val cr = item.communityRating
