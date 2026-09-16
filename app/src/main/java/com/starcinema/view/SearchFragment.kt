@@ -106,11 +106,13 @@ class SearchFragment : Fragment() {
                     }
                 }
                 kotlinx.coroutines.delay(300)
-                if (items.isEmpty() || !isAdded || _binding == null) return@onSuccess
+                // 设计文档 v1.0：大家都在看 4 张竖版海报
+                val recommend = items.distinctBy { it.id }.take(4)
+                if (recommend.isEmpty() || !isAdded || _binding == null) return@onSuccess
                 binding.defaultTitleRow.visibility = View.VISIBLE
                 binding.emptyHint.visibility = View.GONE
                 binding.searchList.visibility = View.VISIBLE
-                binding.searchList.adapter = SearchResultAdapter(items, baseUrl, apiKey, client) { openDetail(it) }
+                binding.searchList.adapter = SearchResultAdapter(recommend, baseUrl, apiKey, client) { openDetail(it) }
             }
         }
     }
@@ -169,6 +171,7 @@ class SearchFragment : Fragment() {
             }
         }
         binding.libraryList.adapter = sidebarAdapter
+        sidebarAdapter.selectedKey = "search"
         val items = mutableListOf<SidebarItem>()
         items.add(SidebarItem.Entry("home", getString(R.string.sidebar_home)))
         items.add(SidebarItem.Entry("search", getString(R.string.sidebar_search)))

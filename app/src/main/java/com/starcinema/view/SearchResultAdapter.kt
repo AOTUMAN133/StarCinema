@@ -10,7 +10,7 @@ import com.starcinema.R
 import com.starcinema.api.EmbyClient
 import com.starcinema.api.EmbyItem
 
-/** 搜索结果网格适配器（复用网格卡） */
+/** 搜索结果网格适配器（设计文档 v1.0：竖版海报卡 + 卡内左下评分） */
 class SearchResultAdapter(
     private val items: List<EmbyItem>,
     private val baseUrl: String,
@@ -24,7 +24,7 @@ class SearchResultAdapter(
     override fun getItemCount() = items.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_grid_card, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_poster_card, parent, false)
         return VH(v)
     }
 

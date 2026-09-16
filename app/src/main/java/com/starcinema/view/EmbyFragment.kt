@@ -127,6 +127,7 @@ class EmbyFragment : Fragment() {
         items.add(SidebarItem.Entry("search", getString(R.string.sidebar_search)))
         libs.forEach { items.add(SidebarItem.Lib(it)) }
         items.add(SidebarItem.Entry("settings", getString(R.string.sidebar_settings)))
+        sidebarAdapter.selectedKey = "home"
         sidebarAdapter.submitList(items)
     }
 
@@ -187,6 +188,12 @@ class EmbyFragment : Fragment() {
         binding.bannerArea.visibility = View.VISIBLE
         binding.bannerTitle.text = if (item.type == "Episode" && !item.seriesName.isNullOrBlank()) item.seriesName else item.name
         binding.bannerOverview.text = item.overview ?: ""
+        // 设计文档 v1.0：Banner 金色标签（类型，真实数据；无则不显示）
+        val tag = item.genres?.firstOrNull() ?: typeLabel(item.type)
+        if (!tag.isNullOrBlank()) {
+            binding.bannerTag.text = tag
+            binding.bannerTag.visibility = View.VISIBLE
+        } else binding.bannerTag.visibility = View.GONE
         val bgItemId = if (item.type == "Episode" && !item.seriesId.isNullOrBlank()) item.seriesId else item.id
         val backdropTag = item.backdropImageTags?.firstOrNull()
         val bgUrl = client.getBackdropUrl(baseUrl, bgItemId, backdropTag, apiKey, 1200)
@@ -453,4 +460,14 @@ class EmbyFragment : Fragment() {
     }
 
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    /** 类型 → 中文标签（Banner 金标，真实数据兜底） */
+    private fun typeLabel(type: String?): String? = when (type) {
+        "Movie" -> "电影"
+        "Series" -> "剧集"
+        "Episode" -> "剧集"
+        "MusicAlbum" -> "音乐"
+        "BoxSet" -> "合集"
+        else -> null
+    }
 }

@@ -17,10 +17,14 @@ sealed class SidebarItem {
     data class Lib(val lib: EmbyLibrary) : SidebarItem()
 }
 
-/** 左侧导航栏适配器（设计文档 v1.0：金色渐变胶囊选中态 + 图标 + 发光射线） */
+/** 左侧导航栏适配器（设计文档 v1.0：选中项金色渐变胶囊常驻 + 聚焦黑字；图标 + 发光射线） */
 class SidebarAdapter(
     private val onClick: (SidebarItem) -> Unit
 ) : ListAdapter<SidebarItem, SidebarAdapter.VH>(Diff) {
+
+    /** 当前选中项 key（"home"/"search"/"settings"/媒体库id），选中项常驻金色胶囊 */
+    var selectedKey: String? = null
+        set(value) { field = value; notifyDataSetChanged() }
 
     object Diff : DiffUtil.ItemCallback<SidebarItem>() {
         override fun areItemsTheSame(a: SidebarItem, b: SidebarItem): Boolean = when {
@@ -74,17 +78,49 @@ class SidebarAdapter(
                 is SidebarItem.Lib -> libIcon(item.lib.name)
             }
         )
-        // 默认态：浅灰图标+浅灰文字
-        holder.icon.setColorFilter(
-            holder.itemView.context.getColor(R.color.text_secondary),
-            android.graphics.PorterDuff.Mode.SRC_ATOP
+        // 设计文档 v1.0：选中项金色渐变胶囊常驻（与聚焦无关）；聚焦时金胶囊+黑字增强操作感
+        val key = when (item) {
+            is SidebarItem.Entry -> item.key
+            is SidebarItem.Lib -> item.lib.id
+        }
+        val isSelected = key == selectedKey
+        val hasFocus = holder.itemView.isFocused
+        holder.itemView.setBackgroundResource(
+            when {
+                hasFocus -> R.drawable.bg_sidebar_focus
+                isSelected -> R.drawable.bg_sidebar_selected
+                else -> R.drawable.bg_sidebar_normal
+            }
         )
-        holder.itemView.setOnFocusChangeListener { v, hasFocus ->
-            v.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else R.drawable.bg_sidebar_normal)
-            val c = if (hasFocus) v.context.getColor(R.color.bg_primary) else v.context.getColor(R.color.text_secondary)
-            holder.label.setTextColor(c)
-            holder.icon.setColorFilter(c, android.graphics.PorterDuff.Mode.SRC_ATOP)
-            holder.ray?.visibility = if (hasFocus) View.VISIBLE else View.GONE
+        val c = when {
+            hasFocus -> holder.itemView.context.getColor(R.color.bg_primary)
+            isSelected -> holder.itemView.context.getColor(R.color.gold_primary)
+            else -> holder.itemView.context.getColor(R.color.text_secondary)
+        }
+        holder.label.setTextColor(c)
+        holder.icon.setColorFilter(c, android.graphics.PorterDuff.Mode.SRC_ATOP)
+        holder.ray?.visibility = if (isSelected || hasFocus) View.VISIBLE else View.GONE
+        holder.itemView.setOnFocusChangeListener { v, f ->
+            // 焦点变化只影响聚焦视觉，选中态独立常驻
+            val s = when (item) {
+                is SidebarItem.Entry -> item.key
+                is SidebarItem.Lib -> item.lib.id
+            } == selectedKey
+            v.setBackgroundResource(
+                when {
+                    f -> R.drawable.bg_sidebar_focus
+                    s -> R.drawable.bg_sidebar_selected
+                    else -> R.drawable.bg_sidebar_normal
+                }
+            )
+            val color = when {
+                f -> v.context.getColor(R.color.bg_primary)
+                s -> v.context.getColor(R.color.gold_primary)
+                else -> v.context.getColor(R.color.text_secondary)
+            }
+            holder.label.setTextColor(color)
+            holder.icon.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_ATOP)
+            holder.ray?.visibility = if (s || f) View.VISIBLE else View.GONE
         }
         holder.itemView.setOnClickListener {
             val pos = holder.bindingAdapterPosition

@@ -106,21 +106,22 @@ class DetailFragment : Fragment() {
             } else client.getBackdropUrl(baseUrl, bgItemId, null, apiKey, 1200)
             if (bgUrl != null) EmbyImageLoader.load(binding.background, bgUrl)
 
-            // 元信息行：★评分 · 年份 · 时长（设计文档 v1.0，去 [R] 分级与类型）
+            // 元信息行：年份 · 时长 · ★评分（设计文档 v1.0，评分金色置后，去 [R] 分级与类型）
             binding.infoRow.visibility = View.VISIBLE
-            if (detail.communityRating != null) {
-                binding.ratingText.visibility = View.VISIBLE
-                binding.ratingText.text = "★ ${"%.1f".format(detail.communityRating!!)}"
-            }
             if (detail.productionYear != null) {
                 binding.yearText.visibility = View.VISIBLE
                 binding.yearText.text = detail.productionYear.toString()
-                binding.metaSep1.visibility = View.VISIBLE
             }
             val runtimeMin = detail.runTimeTicks?.let { it / 600000000 }
             if (runtimeMin != null && runtimeMin > 0) {
+                binding.metaSep1.visibility = View.VISIBLE
                 binding.runtimeText.visibility = View.VISIBLE
                 binding.runtimeText.text = "${runtimeMin} 分钟"
+            }
+            if (detail.communityRating != null) {
+                binding.metaSep2.visibility = View.VISIBLE
+                binding.ratingText.visibility = View.VISIBLE
+                binding.ratingText.text = "★ ${"%.1f".format(detail.communityRating!!)}"
             }
 
             // 简介 2 行

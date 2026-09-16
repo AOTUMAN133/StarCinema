@@ -92,17 +92,33 @@
                 android:paddingEnd="16dp"
                 android:focusable="false">
 
-                <TextView
+                <LinearLayout
                     android:id="@+id/navHome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sidebar_home"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/gold_primary"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
                     android:focusable="true"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="6dp" />
+                    android:paddingVertical="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sidebar_home"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/gold_primary" />
+
+                    <!-- 设计文档 v1.0：选中 Tab 金色下划线 -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/bg_nav_underline" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/navSearch"
@@ -180,6 +196,19 @@
                     android:layout_marginStart="36dp"
                     android:layout_marginBottom="30dp">
 
+                    <!-- 设计文档 v1.0：Banner 金色标签（类型，真实数据） -->
+                    <TextView
+                        android:id="@+id/bannerTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_banner_tag"
+                        android:textColor="@color/bg_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="3dp"
+                        android:visibility="gone" />
+
                     <TextView
                         android:id="@+id/bannerTitle"
                         android:layout_width="wrap_content"
@@ -206,13 +235,12 @@
                         android:ellipsize="end" />
                 </LinearLayout>
 
-                <!-- 轮播指示点 -->
+                <!-- 轮播指示点（设计文档 v1.0：正下方居中） -->
                 <LinearLayout
                     android:id="@+id/bannerDots"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="24dp"
+                    android:layout_gravity="bottom|center_horizontal"
                     android:layout_marginBottom="16dp"
                     android:orientation="horizontal" />
             </FrameLayout>

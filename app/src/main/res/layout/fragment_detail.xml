@@ -82,21 +82,11 @@
                 android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/ratingText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/gold_primary"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
-
-                <TextView
                     android:id="@+id/yearText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
                     android:textSize="22sp"
-                    android:layout_marginStart="12dp"
                     android:visibility="gone" />
 
                 <TextView
@@ -115,6 +105,26 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary"
                     android:textSize="22sp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/metaSep2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="·"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="22sp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/ratingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/gold_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
                     android:layout_marginStart="8dp"
                     android:visibility="gone" />
             </LinearLayout>

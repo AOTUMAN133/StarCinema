@@ -74,7 +74,7 @@ class LibraryGridFragment : Fragment() {
 
     private fun setupSidebar() {
         binding.libraryList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-        binding.libraryList.adapter = SidebarAdapter { item ->
+        val sideAdapter = SidebarAdapter { item ->
             when (item) {
                 is SidebarItem.Entry -> when (item.key) {
                     "home" -> requireActivity().supportFragmentManager.popBackStack()
@@ -93,13 +93,15 @@ class LibraryGridFragment : Fragment() {
                 }
             }
         }
+        binding.libraryList.adapter = sideAdapter
+        sideAdapter.selectedKey = libraryId
         // 完整媒体库列表（与首页一致）
         val items = mutableListOf<SidebarItem>()
         items.add(SidebarItem.Entry("home", getString(R.string.sidebar_home)))
         items.add(SidebarItem.Entry("search", getString(R.string.sidebar_search)))
         items.add(SidebarItem.Lib(com.starcinema.api.EmbyLibrary(libraryId, libraryName, collectionType ?: "")))
         items.add(SidebarItem.Entry("settings", getString(R.string.sidebar_settings)))
-        (binding.libraryList.adapter as SidebarAdapter).submitList(items)
+        sideAdapter.submitList(items)
         lifecycleScope.launch {
             client.getLibraries(baseUrl, apiKey, userId).onSuccess { libs ->
                 if (!isAdded || _binding == null) return@onSuccess
@@ -108,7 +110,7 @@ class LibraryGridFragment : Fragment() {
                 full.add(SidebarItem.Entry("search", getString(R.string.sidebar_search)))
                 libs.forEach { full.add(SidebarItem.Lib(it)) }
                 full.add(SidebarItem.Entry("settings", getString(R.string.sidebar_settings)))
-                (binding.libraryList.adapter as SidebarAdapter).submitList(full)
+                sideAdapter.submitList(full)
             }
         }
     }
