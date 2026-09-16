@@ -11,8 +11,8 @@ android {
         applicationId = "com.starcinema"
         minSdk = 24
         targetSdk = 35
-        versionCode = 14
-        versionName = "0.11.2"
+        versionCode = 15
+        versionName = "0.12.0"
         multiDexEnabled = true
     }
 
