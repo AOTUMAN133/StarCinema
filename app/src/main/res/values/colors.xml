@@ -29,4 +29,13 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
+    <!-- ===== 播放器兼容别名（PlayerActivity/弹幕引用） ===== -->
+    <color name="star_bg">#0A0A0A</color>
+    <color name="star_gold">#F5C542</color>
+    <color name="star_text">#E2E2E9</color>
+    <color name="star_text_secondary">#B0B0B0</color>
+    <color name="btn_icon_no_select">#F8F8F8</color>
+    <color name="btn_icon_select">#F5C542</color>
+    <color name="focus_text_color">#F5C542</color>
+    <color name="white_sub">#CCFFFFFF</color>
 </resources>

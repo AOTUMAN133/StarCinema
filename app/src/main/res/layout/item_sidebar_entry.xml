@@ -33,7 +33,7 @@
         android:id="@+id/sidebar_item_ray"
         android:layout_width="3dp"
         android:layout_height="20dp"
-        android:layout_marginStart="auto"
+        android:layout_gravity="end"
         android:background="@color/gold_primary"
         android:visibility="gone" />
 </LinearLayout>

@@ -12,4 +12,18 @@
     <string name="hot_row">热门推荐</string>
     <string name="continue_watch">继续观看</string>
     <string name="see_all">更多&gt;</string>
+    <string name="app_version_label">版本</string>
+    <string name="see_all_text">更多</string>
+    <string name="jump">跳转</string>
+    <string name="speed_2_tip">倍速</string>
+    <string name="video_end_time">结束时间</string>
+    <string name="intro_start_video_time">片头开始</string>
+    <string name="intro_end_video_time">片头结束</string>
+    <string name="danmu_lines">弹幕行数</string>
+    <string name="danmu_size">弹幕字号</string>
+    <string name="danmu_speed">弹幕速度</string>
+    <string name="danmu_tran">弹幕透明度</string>
+    <string name="sub_delay">字幕延迟</string>
+    <string name="sub_scale">字幕缩放</string>
+    <string name="sub_pos">字幕位置</string>
 </resources>

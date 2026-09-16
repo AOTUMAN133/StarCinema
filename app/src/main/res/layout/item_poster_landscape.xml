@@ -45,14 +45,14 @@
                     android:id="@+id/progressFill"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="0f"
+                    android:layout_weight="0.0"
                     android:background="@color/gold_primary" />
 
                 <View
                     android:id="@+id/progressTrack"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="100f"
+                    android:layout_weight="100.0"
                     android:background="#66000000" />
             </LinearLayout>
 

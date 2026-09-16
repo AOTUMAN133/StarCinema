@@ -186,8 +186,6 @@ class VideoTypeRecyclerAdapterDiff(
         holder.moreText.visibility = if (row.see) View.VISIBLE else View.GONE
         holder.videoList.layoutManager = EdgeLockLinearLayoutManager(holder.itemView.context, RecyclerView.HORIZONTAL, false)
         holder.videoList.adapter = row.adapter
-        // DpadRecyclerView 必须 setSelectedPosition(0) 才能把焦点委托给 item（否则方向键焦点丢失）
-        holder.videoList.setSelectedPosition(0)
 
         holder.typeText.setOnClickListener { row.onTitleClick?.invoke() }
         holder.typeText.setOnKeyListener { v, keyCode, event ->
@@ -196,16 +194,16 @@ class VideoTypeRecyclerAdapterDiff(
             ) { v.performClick(); true } else false
         }
         holder.typeText.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-            v.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.gold_primary)
+            holder.typeText.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.gold_primary)
                 else holder.itemView.context.getColor(R.color.text_primary))
-            v.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else 0)
-            v.setPadding(16, 6, 16, 6)
+            holder.typeText.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else 0)
+            holder.typeText.setPadding(16, 6, 16, 6)
         }
         holder.moreText.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-            v.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.gold_primary)
+            holder.moreText.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.gold_primary)
                 else holder.itemView.context.getColor(R.color.text_secondary))
-            v.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else 0)
-            v.setPadding(16, 6, 16, 6)
+            holder.moreText.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else 0)
+            holder.moreText.setPadding(16, 6, 16, 6)
         }
         // 行标题左键 → 侧栏（由 Fragment 全局路由处理，这里只保证标题可达）
         holder.typeText.nextFocusRightId = R.id.videoList
@@ -220,6 +218,6 @@ class VideoTypeRecyclerAdapterDiff(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val typeText: TextView = view.findViewById(R.id.typeText)
         val moreText: TextView = view.findViewById(R.id.moreText)
-        val videoList: com.rubensousa.dpadrecyclerview.DpadRecyclerView = view.findViewById(R.id.videoList)
+        val videoList: RecyclerView = view.findViewById(R.id.videoList)
     }
 }

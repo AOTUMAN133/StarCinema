@@ -356,11 +356,10 @@ class EmbyFragment : Fragment() {
         if (vh == null) {
             binding.contentList.postDelayed({ retryFocus(row, item, attempt + 1) }, 200); return
         }
-        val videoList = vh.itemView.findViewById<com.rubensousa.dpadrecyclerview.DpadRecyclerView>(R.id.videoList) ?: return
-        videoList.setSelectedPosition(item)
+        val videoList = vh.itemView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.videoList) ?: return
+        videoList.scrollToPosition(item)
         videoList.postDelayed({
             videoList.findViewHolderForAdapterPosition(item)?.itemView?.requestFocus()
-            videoList.findViewHolderForAdapterPosition(item)?.itemView?.isFocusable = true
         }, 150)
     }
 

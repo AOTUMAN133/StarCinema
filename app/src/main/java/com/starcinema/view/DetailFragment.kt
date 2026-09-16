@@ -72,7 +72,7 @@ class DetailFragment : Fragment() {
     private fun loadDetail(itemId: String) {
         binding.loadingIndicator.visibility = View.VISIBLE
         lifecycleScope.launch {
-            client.getItemById(baseUrl, apiKey, userId, itemId).onSuccess { detail ->
+            client.getItemDetail(baseUrl, apiKey, userId, itemId).onSuccess { detail ->
                 if (!isAdded || _binding == null) return@onSuccess
                 item = detail
                 bindDetail(detail)
@@ -156,13 +156,15 @@ class DetailFragment : Fragment() {
                 }
             }
 
-            // 相关推荐：横版 4 张（Thumb/Backdrop）
-            val recommend = (detail.similarItems ?: emptyList()).take(4)
-            if (recommend.isNotEmpty()) {
-                binding.recommendSection.visibility = View.VISIBLE
-                binding.recommendRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                binding.recommendRecyclerView.adapter = RecommendAdapter(recommend, baseUrl, apiKey, client) { rec ->
-                    openDetail(rec.id)
+            // 相关推荐：横版 4 张（Thumb/Backdrop，异步加载）
+            lifecycleScope.launch {
+                client.getSimilarItems(baseUrl, apiKey, userId, detail.id, 4).onSuccess { recs ->
+                    if (!isAdded || _binding == null || recs.isEmpty()) return@onSuccess
+                    binding.recommendSection.visibility = View.VISIBLE
+                    binding.recommendRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                    binding.recommendRecyclerView.adapter = RecommendAdapter(recs, baseUrl, apiKey, client) { rec ->
+                        openDetail(rec.id)
+                    }
                 }
             }
 

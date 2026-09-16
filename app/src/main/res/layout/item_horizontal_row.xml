@@ -39,7 +39,7 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <com.rubensousa.dpadrecyclerview.DpadRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/videoList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

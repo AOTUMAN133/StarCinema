@@ -32,4 +32,7 @@
     <dimen name="icon_btn">20dp</dimen>
     <dimen name="icon_aux">16dp</dimen>
     <dimen name="radius_poster">8dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="video_detail_btn_width">50dp</dimen>
+    <dimen name="player_set_width">460dp</dimen>
 </resources>

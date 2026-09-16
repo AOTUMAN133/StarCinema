@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true">
-        <shape android:shape="oval">
-            <solid android:color="#F5C542" />
-            <stroke android:width="3dp" android:color="#FFE082" />
-            <size android:width="18dp" android:height="18dp" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="oval">
-            <solid android:color="#F5C542" />
-            <size android:width="12dp" android:height="12dp" />
-        </shape>
-    </item>
+    <item
+        android:state_focused="false"
+        android:drawable="@drawable/seekbar_thumb_unselect"/>
+    <item
+        android:state_focused="true"
+        android:drawable="@drawable/seekbar_thumb_select"/>
 </selector>

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.starcinema.BuildConfig
 import com.starcinema.R
 import com.starcinema.app.EmbyServerConfig
 import com.starcinema.app.PreferencesHelper
