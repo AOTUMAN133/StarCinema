@@ -422,8 +422,24 @@ class EmbyFragment : Fragment() {
             binding.navSettings.nextFocusDownId = R.id.contentList
         }
         val rows = mutableListOf<VideoType>()
-        // 热门推荐：跨库聚合 6 张竖版海报（设计文档：6 张）
-        val hot = latest.flatMap { it.second }.distinctBy { it.id }.take(6)
+        // 热门推荐：跨库轮转各取 1 张（避免单一库霸屏），共 6 张竖版海报（设计文档：6 张）
+        val hot = mutableListOf<EmbyItem>()
+        val perLib = latest.map { (_, items) -> items.firstOrNull() }.filterNotNull()
+        var idx = 0
+        while (hot.size < 6 && perLib.isNotEmpty()) {
+            perLib.forEach { item ->
+                if (hot.size < 6 && hot.none { it.id == item.id }) {
+                    hot.add(item); idx++
+                }
+            }
+            // 全部轮完还不够 6 张：从各库第 2 张起补
+            if (idx == perLib.size) break
+        }
+        if (hot.size < 6) {
+            latest.flatMap { it.second }.forEach { item ->
+                if (hot.size < 6 && hot.none { it.id == item.id }) hot.add(item)
+            }
+        }
         if (hot.isNotEmpty()) {
             rows.add(VideoType(
                 typeText = getString(R.string.hot_row),

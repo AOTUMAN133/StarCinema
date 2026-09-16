@@ -130,11 +130,10 @@ class DetailFragment : Fragment() {
                 binding.overviewText.text = detail.overview
             }
 
-            // 操作按钮：立即播放（金色实心）+ 收藏（描边）+ 更多；剧集详情加"剧集"
+            // 操作按钮：立即播放（金色实心）+ 收藏（描边）；剧集详情加"剧集"（设计文档 v1.0：2 按钮 + 剧集入口）
             binding.actionBtnContainer.removeAllViews()
             addPlayButton(detail)
             addActionButton("收藏", R.drawable.bg_btn_ghost, R.drawable.ic_sidebar_home) { toggleFavorite(detail) }
-            addActionButton("更多", R.drawable.bg_btn_ghost, R.drawable.ic_sidebar_search) { showMoreMenu(detail) }
             if (detail.type == "Series" || detail.type == "Season") {
                 addActionButton("剧集", R.drawable.bg_btn_ghost, R.drawable.ic_sidebar_library) { scrollToEpisodes() }
             }
@@ -541,7 +540,6 @@ class EpisodeAdapter(
                     .setDuration(200).start()
                 FocusStyleHelper.applyCardFocusBorder(card, hasFocus, h.itemView.context)
             }
-            if (!hidden) v.animate().translationZ(if (hasFocus) 8f else 0f).setDuration(120).start()
         }
     }
 
@@ -685,7 +683,6 @@ class RecommendAdapter(
                     .setDuration(200).start()
                 FocusStyleHelper.applyCardFocusBorder(card, hasFocus, h.itemView.context)
             }
-            if (!hidden) v.animate().translationZ(if (hasFocus) 8f else 0f).setDuration(120).start()
         }
     }
 

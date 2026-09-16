@@ -250,7 +250,6 @@ class GridAdapter(
                     .setDuration(200).start()
                 FocusStyleHelper.applyCardFocusBorder(card, hasFocus, h.itemView.context)
             }
-            if (!hidden) v.animate().translationZ(if (hasFocus) 8f else 0f).setDuration(120).start()
         }
     }
 

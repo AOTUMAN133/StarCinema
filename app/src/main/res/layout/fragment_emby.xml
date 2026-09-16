@@ -174,14 +174,21 @@
                 android:clipChildren="false"
                 android:visibility="gone">
 
-                <ImageView
-                    android:id="@+id/heroBackground"
+                <!-- Banner 背景图：外包圆角裁剪容器（clipToOutline 兜底，杜绝直角溢出） -->
+                <FrameLayout
+                    android:id="@+id/heroClipBox"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
                     android:clipToOutline="true"
                     android:outlineProvider="background"
-                    android:background="@drawable/bg_hero_card" />
+                    android:background="@drawable/bg_hero_card">
+
+                    <ImageView
+                        android:id="@+id/heroBackground"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+                </FrameLayout>
 
                 <View
                     android:layout_width="match_parent"

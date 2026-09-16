@@ -127,7 +127,6 @@ class HorizontalItemAdapter(
                     .setDuration(200).start()
                 FocusStyleHelper.applyCardFocusBorder(card, hasFocus, ctx)
             }
-            if (!hidden) v.animate().translationZ(if (hasFocus) 8f else 0f).setDuration(120).start()
         }
     }
 

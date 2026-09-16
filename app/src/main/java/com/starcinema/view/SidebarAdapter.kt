@@ -94,7 +94,7 @@ class SidebarAdapter(
         )
         val c = when {
             hasFocus -> holder.itemView.context.getColor(R.color.bg_primary)
-            isSelected -> holder.itemView.context.getColor(R.color.gold_primary)
+            isSelected -> holder.itemView.context.getColor(R.color.bg_primary)
             else -> holder.itemView.context.getColor(R.color.text_secondary)
         }
         holder.label.setTextColor(c)
@@ -115,7 +115,7 @@ class SidebarAdapter(
             )
             val color = when {
                 f -> v.context.getColor(R.color.bg_primary)
-                s -> v.context.getColor(R.color.gold_primary)
+                s -> v.context.getColor(R.color.bg_primary)
                 else -> v.context.getColor(R.color.text_secondary)
             }
             holder.label.setTextColor(color)
