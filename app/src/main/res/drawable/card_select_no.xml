@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 深色主题: 未聚焦 = 深色薄雾 -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#80111318"/>
-    <corners android:radius="18dp"/>
-    <stroke
-        android:width="2dp"
-        android:color="#00FFFFFF"/>
-</shape>

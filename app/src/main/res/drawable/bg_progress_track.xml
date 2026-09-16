@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 星光影院：进度条灰色轨道（圆角） -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#40FFFFFF" />
-    <corners android:radius="2dp" />
-</shape>

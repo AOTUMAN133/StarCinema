@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 星光影院：侧栏聚焦金色发光指示条（水平射线） -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#FFE8B64C"
-        android:endColor="#00E8B64C"
-        android:angle="0" />
-</shape>
