@@ -61,7 +61,7 @@ class SearchFragment : Fragment() {
         // 星光影院：热门搜索词点击 → 填入搜索框并搜索
         val hotWords = listOf(
             binding.hotWord1, binding.hotWord2, binding.hotWord3,
-            binding.hotWord4, binding.hotWord5
+            binding.hotWord4, binding.hotWord5, binding.hotWord6
         )
         hotWords.forEach { tv ->
             tv.setOnClickListener {
@@ -76,6 +76,11 @@ class SearchFragment : Fragment() {
                     if (hasFocus) v.context.getColor(R.color.star_bg)
                     else v.context.getColor(R.color.star_text_secondary)
                 )
+                // 设计文档 v1.0：热门标签选中态带火焰图标（金色实心 + 火焰）
+                v.setCompoundDrawablesWithIntrinsicBounds(
+                    if (hasFocus) R.drawable.ic_fire else 0, 0, 0, 0
+                )
+                if (hasFocus) v.compoundDrawablePadding = v.context.resources.getDimensionPixelSize(R.dimen.corner_radius) / 2
             }
         }
 

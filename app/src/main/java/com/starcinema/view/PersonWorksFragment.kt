@@ -78,8 +78,47 @@ class PersonWorksFragment : Fragment() {
                     },
                     landscape = false
                 )
+                // 设计文档 v1.0：默认焦点第一张（最新作品）
+                binding.videoList.post { retryFocusFirstWork(0) }
+                // 设计文档 v1.0：代表作 = 年份最新作品（真实数据，不造假）
+                val latest = sorted.firstOrNull()
+                if (latest != null) {
+                    val meta = StringBuilder()
+                    meta.append("代表作：${latest.name}")
+                    loadPersonMeta(personId, meta)
+                }
             }.onFailure {
                 binding.loadingIndicator.visibility = View.GONE
+            }
+        }
+    }
+
+    /** 请求作品行第一张聚焦（带重试：RecyclerView 布局前 ViewHolder 不存在） */
+    private fun retryFocusFirstWork(attempt: Int) {
+        if (!isAdded || _binding == null) return
+        val vh = binding.videoList.findViewHolderForAdapterPosition(0)
+        if (vh != null) { vh.itemView.requestFocus(); return }
+        if (attempt >= 8) return
+        binding.videoList.postDelayed({ retryFocusFirstWork(attempt + 1) }, 250)
+    }
+
+    /** 加载演员详情补全生日（Emby Person PremiereDate=出生日期） */
+    private fun loadPersonMeta(personId: String, meta: StringBuilder) {
+        lifecycleScope.launch {
+            client.getPersonDetail(baseUrl, apiKey, userId, personId).onSuccess { detail ->
+                if (!isAdded || _binding == null) return@onSuccess
+                val born = (detail["PremiereDate"] as? String)?.take(10)
+                if (born != null && born.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
+                    val year = born.take(4)
+                    val month = born.substring(5, 7).toIntOrNull()
+                    val day = born.substring(8, 10).toIntOrNull()
+                    if (month != null && day != null) {
+                        meta.append("\n生日：${year} 年 ${month} 月 ${day} 日")
+                    } else {
+                        meta.append("\n生日：$year")
+                    }
+                }
+                if (meta.isNotBlank()) binding.personMeta.text = meta.toString()
             }
         }
     }

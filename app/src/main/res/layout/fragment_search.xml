@@ -183,6 +183,10 @@
                     android:id="@+id/hotWord5"
                     style="@style/HotWordTag"
                     android:text="动画" />
+                <TextView
+                    android:id="@+id/hotWord6"
+                    style="@style/HotWordTag"
+                    android:text="剧情" />
             </LinearLayout>
 
             <!-- 分类筛选 Chips -->

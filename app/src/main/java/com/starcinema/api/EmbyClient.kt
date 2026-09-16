@@ -1158,6 +1158,38 @@ class EmbyClient {
         }
     }
 
+    /** 获取演员个人详情（生日 PremiereDate / 简介 Overview / 标签），返回原始字段 map */
+    suspend fun getPersonDetail(
+        baseUrl: String,
+        apiKey: String,
+        userId: String,
+        personId: String
+    ): Result<Map<String, Any>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val fields = "PremiereDate,ProductionYear,Overview,CommunityRating,People,Taglines"
+                val url = apiUrl(baseUrl, "Users/$userId/Items/${java.net.URLEncoder.encode(personId, "UTF-8")}?Fields=$fields")
+                val response = client.newCall(
+                    Request.Builder()
+                        .url(url)
+                        .header("X-Emby-Token", apiKey).header("X-Emby-Client", CLIENT_NAME).header("X-Emby-Device-Name", DEVICE_NAME).header("X-Emby-Device-Id", DEVICE_ID).header("X-Emby-Client-Version", VERSION)
+                        .header("Authorization", authHeader(apiKey))
+                        .header("X-Emby-Authorization", authHeader(apiKey))
+                        .build()
+                ).execute()
+                val body = response.body?.string() ?: "{}"
+                if (!response.isSuccessful) {
+                    return@withContext Result.failure(IOException("HTTP ${response.code}: ${body.take(200)}"))
+                }
+                @Suppress("UNCHECKED_CAST")
+                val json = gson.fromJson(body, Map::class.java) as Map<String, Any>
+                Result.success(json)
+            } catch (e: Exception) {
+                Result.failure(IOException("获取演员详情失败: ${e.message}", e))
+            }
+        }
+    }
+
     // ====== 增强的 parseItem ======
 
     private fun parseItemsList(json: String): List<EmbyItem> {

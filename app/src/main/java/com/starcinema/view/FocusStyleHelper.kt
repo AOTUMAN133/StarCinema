@@ -44,10 +44,13 @@ object FocusStyleHelper {
         if (focused && !hidden(context)) {
             card.setStrokeColor(android.content.res.ColorStateList.valueOf(focusColor(context)))
             card.strokeWidth = dp(context, focusWidthDp(context).coerceAtLeast(2))
+            // 星光影院：聚焦卡片 elevation 提升（近似设计稿金色发光阴影，Android 原生无彩色阴影）
+            card.cardElevation = dp(context, 8).toFloat()
         } else {
             // 透明边框保布局不跳动
             card.setStrokeColor(android.content.res.ColorStateList.valueOf(0x00FFFFFF))
             card.strokeWidth = 2
+            card.cardElevation = 0f
         }
     }
 

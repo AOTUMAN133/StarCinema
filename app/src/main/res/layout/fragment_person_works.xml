@@ -68,9 +68,25 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
-                    app:layout_constraintBottom_toBottomOf="@id/headerBox"
+                    app:layout_constraintBottom_toTopOf="@id/personMeta"
                     app:layout_constraintStart_toEndOf="@id/headerBox"
                     app:layout_constraintTop_toTopOf="@id/headerBox" />
+
+                <!-- 星光影院：代表作 / 生日（设计文档 v1.0 界面06） -->
+                <TextView
+                    android:id="@+id/personMeta"
+                    android:textSize="14sp"
+                    android:textColor="@color/star_text_secondary"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintStart_toEndOf="@id/headerBox"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/personName" />
 
                 <TextView
                     android:id="@+id/personOverview"
