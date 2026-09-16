@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院 UI 基座：设计文档 v1.0 色彩体系（docs/design-doc-full.md 第二章），纯净黑金 -->
+<resources>
+    <!-- ===== 品牌金（主强调色=选中态/图标） ===== -->
+    <color name="gold_light">#FFE082</color>
+    <color name="gold_primary">#F5C542</color>
+    <color name="gold_secondary">#D4A017</color>
+    <color name="gold_dark">#B8860B</color>
+
+    <!-- ===== 中性色（背景/文字） ===== -->
+    <color name="bg_primary">#0A0A0A</color>
+    <color name="bg_secondary">#141414</color>
+    <color name="bg_card">#1A1A1A</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0B0B0</color>
+    <color name="text_muted">#666666</color>
+
+    <!-- ===== 焦点态（设计文档第五章） ===== -->
+    <color name="focus_border">#F5C542</color>
+    <color name="focus_glow">#66F5C542</color>
+    <color name="focus_glow_strong">#99F5C542</color>
+
+    <!-- ===== 播放器内核必要色（PlayerActivity 布局/弹幕/进度条） ===== -->
+    <color name="player_progress_track">#80D8D8D8</color>
+    <color name="player_progress_fill_start">#FFE8B64C</color>
+    <color name="player_progress_fill_end">#F5C542</color>
+    <color name="player_btn_icon">#F8F8F8</color>
+    <color name="player_panel_bg">#CC141414</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+</resources>

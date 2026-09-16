@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：侧栏条目（图标 + 文字，聚焦金色胶囊） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="4dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_sidebar_normal"
+    android:focusable="true"
+    android:clickable="true"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <ImageView
+        android:id="@+id/sidebar_item_icon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:contentDescription="@string/app_name" />
+
+    <TextView
+        android:id="@+id/sidebar_item_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textSize="15sp"
+        android:singleLine="true"
+        android:ellipsize="end" />
+
+    <!-- 右侧发光射线（聚焦时显示） -->
+    <View
+        android:id="@+id/sidebar_item_ray"
+        android:layout_width="3dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="auto"
+        android:background="@color/gold_primary"
+        android:visibility="gone" />
+</LinearLayout>

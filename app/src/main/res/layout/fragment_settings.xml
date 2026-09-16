@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：设置页（服务器 / 焦点样式 / 关于，C 组网盘账户不移植不做假功能） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_primary"
+    android:padding="32dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sidebar_settings"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/gold_primary"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:id="@+id/serverEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/bg_card"
+        android:focusable="true"
+        android:clickable="true"
+        android:padding="20dp"
+        android:layout_marginBottom="12dp"
+        android:clipToOutline="true"
+        android:outlineProvider="background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_my"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Emby 服务器列表 / 添加 / 切换"
+            android:textSize="13sp"
+            android:textColor="@color/text_muted" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/focusEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/bg_card"
+        android:focusable="true"
+        android:clickable="true"
+        android:padding="20dp"
+        android:layout_marginBottom="12dp"
+        android:clipToOutline="true"
+        android:outlineProvider="background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="焦点样式"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="缩放 / 边框 / 圆角 / 指示"
+            android:textSize="13sp"
+            android:textColor="@color/text_muted" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/aboutEntry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/bg_card"
+        android:focusable="true"
+        android:clickable="true"
+        android:padding="20dp"
+        android:clipToOutline="true"
+        android:outlineProvider="background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关于"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="版本 / 信息"
+            android:textSize="13sp"
+            android:textColor="@color/text_muted" />
+    </LinearLayout>
+</LinearLayout>

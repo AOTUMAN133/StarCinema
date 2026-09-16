@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：导航选中态——金色渐变胶囊（左亮右暗）+ 金色辉光 -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:startColor="#FFE082"
+                android:centerColor="#F5C542"
+                android:endColor="#D4A017"
+                android:angle="0" />
+            <stroke android:width="1dp" android:color="#FFF5C542" />
+        </shape>
+    </item>
+</ripple>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">星空影院</string>
+    <string name="sidebar_home">首页</string>
+    <string name="sidebar_search">搜索</string>
+    <string name="sidebar_settings">设置</string>
+    <string name="server_add">添加服务器</string>
+    <string name="server_my">我的服务器</string>
+    <string name="search_hint">搜索片名 / 演员 / 类型</string>
+    <string name="hot_search">热门搜索</string>
+    <string name="hot_recommend">大家都在看</string>
+    <string name="hot_row">热门推荐</string>
+    <string name="continue_watch">继续观看</string>
+    <string name="see_all">更多&gt;</string>
+</resources>

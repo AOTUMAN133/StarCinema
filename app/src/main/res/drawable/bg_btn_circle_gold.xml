@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：大号金色圆形按钮（播放/暂停） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient
+        android:startColor="#FFE082"
+        android:centerColor="#F5C542"
+        android:endColor="#D4A017"
+        android:angle="0" />
+</shape>

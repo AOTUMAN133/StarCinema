@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院间距/字号：设计文档 v1.0（第二章），dp 值 = 设计 px / 2（1920 基准 xhdpi） -->
+<resources>
+    <!-- ===== 间距与布局（8px 网格） ===== -->
+    <dimen name="page_margin">20dp</dimen>
+    <dimen name="section_padding">30dp</dimen>
+    <dimen name="card_spacing_grid">8dp</dimen>
+    <dimen name="card_spacing_row">12dp</dimen>
+    <dimen name="sidebar_width_percent">0.18</dimen>
+
+    <!-- ===== 圆角 ===== -->
+    <dimen name="corner_small">4dp</dimen>
+    <dimen name="corner_medium">6dp</dimen>
+    <dimen name="corner_large">8dp</dimen>
+    <dimen name="corner_pill">12dp</dimen>
+
+    <!-- ===== 字体（TV 10 英尺优化，风格对齐设计稿层级） ===== -->
+    <dimen name="text_h1">36sp</dimen>
+    <dimen name="text_h2">24sp</dimen>
+    <dimen name="text_h3">18sp</dimen>
+    <dimen name="text_body">15sp</dimen>
+    <dimen name="text_caption">13sp</dimen>
+
+    <!-- ===== 组件尺寸 ===== -->
+    <dimen name="banner_height">190dp</dimen>
+    <dimen name="poster_card_width">110dp</dimen>
+    <dimen name="poster_card_height">165dp</dimen>
+    <dimen name="grid_card_width">208dp</dimen>
+    <dimen name="grid_card_height">117dp</dimen>
+    <dimen name="top_nav_height">56dp</dimen>
+    <dimen name="icon_nav">24dp</dimen>
+    <dimen name="icon_btn">20dp</dimen>
+    <dimen name="icon_aux">16dp</dimen>
+    <dimen name="radius_poster">8dp</dimen>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：主演圆头像卡（金框 + 姓名） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="96dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:focusable="true"
+    android:clickable="true"
+    android:layout_marginEnd="16dp"
+    android:clipChildren="false">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/avatarBox"
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        app:cardCornerRadius="34dp"
+        app:cardBackgroundColor="@color/bg_card"
+        app:strokeColor="#00F5C542"
+        app:strokeWidth="2dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:id="@+id/avatarImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/actorName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textSize="13sp"
+        android:textColor="@color/text_secondary"
+        android:singleLine="true"
+        android:ellipsize="end" />
+</LinearLayout>
