@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 星光影院：主按钮金色实心聚焦态（白色描边加强可见性） -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <gradient
+                android:startColor="#FFE082"
+                android:centerColor="#F5C542"
+                android:endColor="#D4A017"
+                android:angle="0" />
+            <stroke android:width="2dp" android:color="#FFFFFF" />
+        </shape>
+    </item>
+</ripple>

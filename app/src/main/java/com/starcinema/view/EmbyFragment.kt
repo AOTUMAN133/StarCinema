@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -158,6 +159,18 @@ class EmbyFragment : Fragment() {
 
     // ===== 顶部 Tab 栏 =====
     private fun wireTopNav() {
+        val gold = requireContext().getColor(R.color.gold_primary)
+        val secondary = requireContext().getColor(R.color.text_secondary)
+
+        fun setTabState(tab: View, line: View?, active: Boolean) {
+            val tv = (tab as? ViewGroup)?.getChildAt(0) as? TextView ?: return
+            tv.setTextColor(if (active) gold else secondary)
+            line?.visibility = if (active) View.VISIBLE else View.INVISIBLE
+        }
+
+        // 设计文档 v1.0：首页常驻金色下划线（选中态）；搜索/设置聚焦时亮起
+        setTabState(binding.navHome, binding.navHomeLine, true)
+
         binding.navHome.setOnClickListener { binding.navHome.requestFocus() }
         binding.navSearch.setOnClickListener { openPage(SearchFragment()) }
         binding.navSettings.setOnClickListener { openPage(SettingsFragment()) }
@@ -166,6 +179,13 @@ class EmbyFragment : Fragment() {
                 if (event.action == android.view.KeyEvent.ACTION_UP &&
                     (keyCode == android.view.KeyEvent.KEYCODE_DPAD_CENTER || keyCode == android.view.KeyEvent.KEYCODE_ENTER)
                 ) { v.performClick(); true } else false
+            }
+            tv.setOnFocusChangeListener { v, hasFocus ->
+                when (v.id) {
+                    R.id.navHome -> setTabState(binding.navHome, binding.navHomeLine, true) // 首页选中态常驻
+                    R.id.navSearch -> setTabState(binding.navSearch, binding.navSearchLine, hasFocus)
+                    R.id.navSettings -> setTabState(binding.navSettings, binding.navSettingsLine, hasFocus)
+                }
             }
         }
         // 时间
@@ -422,6 +442,14 @@ class EmbyFragment : Fragment() {
             binding.navSettings.nextFocusDownId = R.id.contentList
         }
         val rows = mutableListOf<VideoType>()
+        // 继续观看：横版含进度（置顶，TV 习惯：未看完优先）
+        if (resumeItems.isNotEmpty()) {
+            rows.add(VideoType(
+                typeText = getString(R.string.continue_watch),
+                adapter = HorizontalItemAdapter(resumeItems, baseUrl, apiKey, client, onClick = { openDetail(it) }, landscape = true),
+                see = false
+            ))
+        }
         // 热门推荐：跨库轮转各取 1 张（避免单一库霸屏），共 6 张竖版海报（设计文档：6 张）
         val hot = mutableListOf<EmbyItem>()
         val perLib = latest.map { (_, items) -> items.firstOrNull() }.filterNotNull()
@@ -444,14 +472,6 @@ class EmbyFragment : Fragment() {
             rows.add(VideoType(
                 typeText = getString(R.string.hot_row),
                 adapter = HorizontalItemAdapter(hot, baseUrl, apiKey, client, onClick = { openDetail(it) }),
-                see = false
-            ))
-        }
-        // 继续观看：横版含进度
-        if (resumeItems.isNotEmpty()) {
-            rows.add(VideoType(
-                typeText = getString(R.string.continue_watch),
-                adapter = HorizontalItemAdapter(resumeItems, baseUrl, apiKey, client, onClick = { openDetail(it) }, landscape = true),
                 see = false
             ))
         }

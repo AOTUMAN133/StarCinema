@@ -61,6 +61,13 @@ class LibraryGridFragment : Fragment() {
                 spanCount = 4
             }
         )
+        // 设计文档 v1.0：海报间距 32-40px（等距）。用库自带 Grid Spacing（RecyclerView padding 已提供安全边距）
+        val spacingPx = (20 * resources.displayMetrics.density).toInt()
+        binding.gridRecyclerView.addItemDecoration(
+            com.rubensousa.dpadrecyclerview.spacing.DpadGridSpacingDecoration(
+                spacingPx, 0, 0, spacingPx
+            )
+        )
 
         binding.filterAll.setOnClickListener { setFilter("all") }
         binding.filterLatest.setOnClickListener { setFilter("latest") }

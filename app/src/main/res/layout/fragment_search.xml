@@ -4,11 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     android:background="@color/bg_primary">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipChildren="false">
 
         <!-- 左侧导航 -->
         <LinearLayout
@@ -16,6 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
+            android:clipChildren="true"
             android:background="@drawable/bg_drawer"
             app:layout_constraintWidth_percent="0.18"
             app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:clipChildren="false"
+                android:clipChildren="true"
                 android:clipToPadding="false"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp" />
@@ -69,6 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
+            android:clipChildren="false"
             android:paddingTop="20dp"
             app:layout_constraintWidth_percent="0.82"
             app:layout_constraintStart_toEndOf="@id/librarySidebar"
@@ -214,6 +218,8 @@
                 android:layout_marginTop="10dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:visibility="gone" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

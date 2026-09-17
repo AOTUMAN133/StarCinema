@@ -193,13 +193,14 @@ class VideoTypeRecyclerAdapterDiff(
             ) { v.performClick(); true } else false
         }
         holder.typeText.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-            holder.typeText.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.gold_primary)
+            // 聚焦：金底黑字（与侧栏胶囊一致，避免金底金字看不清）
+            holder.typeText.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.bg_primary)
                 else holder.itemView.context.getColor(R.color.text_primary))
             holder.typeText.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else 0)
             holder.typeText.setPadding(16, 6, 16, 6)
         }
         holder.moreText.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-            holder.moreText.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.gold_primary)
+            holder.moreText.setTextColor(if (hasFocus) holder.itemView.context.getColor(R.color.bg_primary)
                 else holder.itemView.context.getColor(R.color.text_secondary))
             holder.moreText.setBackgroundResource(if (hasFocus) R.drawable.bg_sidebar_focus else 0)
             holder.moreText.setPadding(16, 6, 16, 6)

@@ -133,7 +133,7 @@ class DetailFragment : Fragment() {
             // 操作按钮：立即播放（金色实心）+ 收藏（描边）；剧集详情加"剧集"（设计文档 v1.0：2 按钮 + 剧集入口）
             binding.actionBtnContainer.removeAllViews()
             addPlayButton(detail)
-            addActionButton("收藏", R.drawable.bg_btn_ghost, R.drawable.ic_sidebar_home) { toggleFavorite(detail) }
+            addActionButton("收藏", R.drawable.bg_btn_ghost, R.drawable.ic_favorite) { toggleFavorite(detail) }
             if (detail.type == "Series" || detail.type == "Season") {
                 addActionButton("剧集", R.drawable.bg_btn_ghost, R.drawable.ic_sidebar_library) { scrollToEpisodes() }
             }
@@ -336,7 +336,8 @@ class DetailFragment : Fragment() {
             setBackgroundResource(R.drawable.bg_btn_gold)
             isFocusable = true
             isClickable = true
-            setPadding(dp(24), dp(12), dp(24), dp(12))
+            minimumHeight = dp(52)
+            setPadding(dp(28), dp(10), dp(28), dp(10))
             setOnClickListener { launchPlayer(detail) }
             setOnKeyListener { v, keyCode, event ->
                 if (event.action == android.view.KeyEvent.ACTION_UP &&
@@ -345,26 +346,53 @@ class DetailFragment : Fragment() {
                      keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
                 ) { v.performClick(); true } else false
             }
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(40))
-                .apply { marginEnd = dp(8) }
             addView(TextView(requireContext()).apply {
                 text = "立即播放"
                 setTextColor(resources.getColor(R.color.bg_primary, null))
                 textSize = 16f
                 setTypeface(null, android.graphics.Typeface.BOLD)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
             })
             nextFocusUpId = R.id.name_box
+            // 聚焦：金色实心 + 白色描边（3 米外清晰）
+            onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+                v.setBackgroundResource(if (hasFocus) R.drawable.bg_btn_gold_focus else R.drawable.bg_btn_gold)
+            }
         }
-        binding.actionBtnContainer.addView(btn)
+        btn.id = android.view.View.generateViewId()
+        // 与上一个按钮建立左右焦点链（TV 遥控器平移）
+        linkActionButtonFocus(btn)
+        binding.actionBtnContainer.addView(
+            btn,
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(52)).apply { marginEnd = dp(10) }
+        )
+    }
+
+    /** 相邻操作按钮建立左右焦点链 */
+    private fun linkActionButtonFocus(btn: View) {
+        val container = binding.actionBtnContainer
+        val count = container.childCount
+        if (count > 0) {
+            val prev = container.getChildAt(count - 1)
+            btn.nextFocusLeftId = prev.id
+            prev.nextFocusRightId = btn.id
+        }
     }
 
     private fun addActionButton(label: String, bg: Int, icon: Int, onClick: () -> Unit) {
+        val textColor = resources.getColor(R.color.text_primary, null)
+        val focusColor = resources.getColor(R.color.bg_primary, null)
         val btn = LinearLayout(requireContext()).apply {
             gravity = Gravity.CENTER
             orientation = LinearLayout.HORIZONTAL
             setBackgroundResource(bg)
             isFocusable = true
             isClickable = true
+            minimumHeight = dp(52)
+            setPadding(dp(20), dp(10), dp(20), dp(10))
             setOnClickListener { onClick() }
             setOnKeyListener { v, keyCode, event ->
                 if (event.action == android.view.KeyEvent.ACTION_UP &&
@@ -373,24 +401,42 @@ class DetailFragment : Fragment() {
                      keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER)
                 ) { v.performClick(); true } else false
             }
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(40))
-                .apply { marginEnd = dp(8) }
             addView(ImageView(requireContext()).apply {
                 setImageResource(icon)
-                setColorFilter(resources.getColor(R.color.text_primary, null), android.graphics.PorterDuff.Mode.SRC_ATOP)
+                setColorFilter(textColor, android.graphics.PorterDuff.Mode.SRC_ATOP)
                 layoutParams = LinearLayout.LayoutParams(dp(20), dp(20))
             })
             if (label.isNotEmpty()) {
                 addView(TextView(requireContext()).apply {
                     text = label
-                    setTextColor(resources.getColor(R.color.text_primary, null))
-                    textSize = 14f
+                    setTextColor(textColor)
+                    textSize = 15f
                     setPadding(dp(8), 0, 0, 0)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
                 })
             }
             nextFocusUpId = R.id.name_box
+            // 聚焦：金底黑字（与侧栏胶囊一致）；失焦恢复描边
+            onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+                v.setBackgroundResource(if (hasFocus) R.drawable.bg_btn_ghost_focus else bg)
+                val c = if (hasFocus) focusColor else textColor
+                for (i in 0 until (v as? ViewGroup)!!.childCount) {
+                    val child = (v as ViewGroup).getChildAt(i)
+                    if (child is ImageView) child.setColorFilter(c, android.graphics.PorterDuff.Mode.SRC_ATOP)
+                    if (child is TextView) child.setTextColor(c)
+                }
+            }
         }
-        binding.actionBtnContainer.addView(btn)
+        btn.id = android.view.View.generateViewId()
+        linkActionButtonFocus(btn)
+        // 显式传父容器 LayoutParams（固定高度 52dp），避免被测量压缩
+        binding.actionBtnContainer.addView(
+            btn,
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(52)).apply { marginEnd = dp(10) }
+        )
     }
 
     private fun toggleFavorite(item: EmbyItem) {

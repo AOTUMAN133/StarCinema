@@ -170,6 +170,7 @@
                 android:layout_height="wrap_content"
                 android:scrollbars="none"
                 android:focusable="false"
+                android:layout_marginTop="14dp"
                 android:paddingHorizontal="14dp">
 
                 <LinearLayout

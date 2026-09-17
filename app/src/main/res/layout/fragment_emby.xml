@@ -14,7 +14,7 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:background="@drawable/bg_drawer"
-        android:clipChildren="false"
+        android:clipChildren="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:clipChildren="false"
+            android:clipChildren="true"
             android:clipToPadding="false"
             android:paddingTop="8dp"
             android:paddingBottom="8dp" />
@@ -112,6 +112,7 @@
 
                     <!-- 设计文档 v1.0：选中 Tab 金色下划线 -->
                     <View
+                        android:id="@+id/navHomeLine"
                         android:layout_width="match_parent"
                         android:layout_height="3dp"
                         android:layout_marginTop="3dp"
@@ -120,27 +121,61 @@
                         android:background="@drawable/bg_nav_underline" />
                 </LinearLayout>
 
-                <TextView
+                <LinearLayout
                     android:id="@+id/navSearch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sidebar_search"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_secondary"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
                     android:focusable="true"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="6dp" />
+                    android:paddingVertical="6dp">
 
-                <TextView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sidebar_search"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_secondary" />
+
+                    <View
+                        android:id="@+id/navSearchLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/bg_nav_underline"
+                        android:visibility="invisible" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/navSettings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sidebar_settings"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_secondary"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
                     android:focusable="true"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="6dp" />
+                    android:paddingVertical="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sidebar_settings"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_secondary" />
+
+                    <View
+                        android:id="@+id/navSettingsLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/bg_nav_underline"
+                        android:visibility="invisible" />
+                </LinearLayout>
 
                 <Space
                     android:layout_width="0dp"

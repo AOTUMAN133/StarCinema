@@ -59,6 +59,8 @@ class SearchFragment : Fragment() {
         )
         var selectedTag: android.widget.TextView? = null
         hotWords.forEach { tv ->
+            tv.isFocusable = true
+            tv.isClickable = true
             tv.setOnClickListener {
                 val word = tv.text.toString()
                 binding.searchEdit.setText(word)
@@ -77,6 +79,17 @@ class SearchFragment : Fragment() {
                 doSearch()
             }
             tv.setOnKeyListener { v, keyCode, event ->
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                        // 下移聚焦结果网格第一张（或默认推荐区）
+                        binding.searchList.post { focusFirstResult() }
+                        return@setOnKeyListener true
+                    }
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+                        binding.searchEdit.requestFocus()
+                        return@setOnKeyListener true
+                    }
+                }
                 if (event.action == KeyEvent.ACTION_UP &&
                     (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)
                 ) { v.performClick(); true } else false
@@ -103,6 +116,9 @@ class SearchFragment : Fragment() {
                 (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)
             ) { doSearch(); true } else false
         }
+        // 显式焦点链：搜索框 DOWN → 第一个热门标签（避免 focusSearch 几何误判跳到侧栏）
+        binding.searchEdit.nextFocusDownId = R.id.hotWord1
+        binding.hotWord6.nextFocusDownId = R.id.searchList
         binding.searchEdit.requestFocus()
     }
 
@@ -115,7 +131,7 @@ class SearchFragment : Fragment() {
                         "movies" -> "Movie"; "tvshows" -> "Series"; else -> null
                     }
                     client.getLatestItems(baseUrl, apiKey, userId, lib.id, 4, typeFilter).onSuccess { list ->
-                        list.forEach { if (items.none { it.id == it.id }) items.add(it) }
+                        list.forEach { if (items.none { existing -> existing.id == it.id }) items.add(it) }
                     }
                 }
                 kotlinx.coroutines.delay(300)
@@ -151,15 +167,21 @@ class SearchFragment : Fragment() {
                     }
                     binding.searchList.visibility = View.VISIBLE
                     binding.searchList.adapter = SearchResultAdapter(results, baseUrl, apiKey, client) { openDetail(it) }
-                    binding.searchList.post {
-                        binding.searchList.findViewHolderForAdapterPosition(0)?.itemView?.requestFocus()
-                    }
+                    focusFirstResult()
                 }.onFailure { e ->
                     binding.loading.visibility = View.GONE
                     binding.emptyHint.text = "搜索失败：${e.message ?: "未知错误"}"
                     binding.emptyHint.visibility = View.VISIBLE
                 }
         }
+    }
+
+    /** 聚焦结果网格第一张（带重试，等 RecyclerView 完成布局） */
+    private fun focusFirstResult(attempt: Int = 0) {
+        if (!isAdded || _binding == null || attempt > 8) return
+        val vh = binding.searchList.findViewHolderForAdapterPosition(0)
+        if (vh != null && vh.itemView.requestFocus()) return
+        binding.searchList.postDelayed({ focusFirstResult(attempt + 1) }, 200)
     }
 
     private fun setupSidebar() {
