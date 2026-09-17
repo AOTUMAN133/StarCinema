@@ -1,6 +1,6 @@
 # StarCinema 星光影院 — 进度档案
 
-> 版本: v0.13.0 (versionCode 17) | 日期: 2026-09-16
+> 版本: v0.13.1 (versionCode 18) | 日期: 2026-09-17
 > 设计文档: docs/design-doc-full.md v1.0 | 旧壳归档: tag v0.12.1-old-shell
 
 ## 一、项目概述
@@ -32,10 +32,18 @@
 
 **总完成度: 90%**
 
-### UI 细腻度修复 (3 轮)
+### UI 细腻度修复 (4 轮)
 1. **设计稿素材核对 9 项**: 侧栏选中态金胶囊/Tab金色下划线/Banner指示点居中/金标签/评分卡内/元信息顺序/推荐卡标题卡内/大家都在看竖版
 2. **粗糙感修复 6 项**: Banner圆角裁剪(外包clip容器)/热门跨库轮转/移除elevation+translationZ阴影/图标重画Material实心/选中态黑字/详情页去"更多"+品牌Logo
 3. **完成度补齐 5 项**: Logo补月牙/主演限4个/搜索标签常驻选中+火焰/标题改serif+去阴影/Banner去阴影
+4. **v0.13.1 全局质感 6 项** (用户实测反馈):
+   - ① 搜索页聚焦放大裁剪 → 根容器链 clipChildren=false + searchList 边距 16dp + 卡片间距 12dp
+   - ② 侧栏滚动越界侵占 Logo → 列表 clipChildren=true + 条目高度 48→44dp (避免满屏贴底)
+   - ③ 媒体库海报紧挨 → DpadGridSpacingDecoration 20dp 等距 + 卡片 208→168dp (修复 PivotLM 空间不足 cover-flow 重叠)
+   - ④ 首页顶部 Tab 摆设 → navSearch/navSettings 对齐 navHome 结构 + 选中金下划线常驻/聚焦亮起
+   - ⑤ 继续观看 → 行置顶 (TV 习惯) + 修复"大家都在看"dedup bug (`it.id==it.id` 恒真 → 永远 1 张, 改后 4 张)
+   - ⑥ 详情页按钮 → 高度 52dp + addView 显式 lp (根治按钮被压成圆形)、收藏换心形图标、聚焦金底黑字/白描边、左右焦点链
+   - 附: 修复首页行标题金底金字看不清 (聚焦黑字)、搜索页焦点链 (搜索框→标签→结果, nextFocusDownId + 结果自动聚焦重试)
 
 ### 播放器 (移植自 v0.12.1-old-shell)
 - [x] PlayerActivity.kt (1631 行)
@@ -58,7 +66,7 @@
 
 | 文件 | 说明 |
 |---|---|
-| app/build.gradle.kts | versionCode=17, versionName=0.13.0 |
+| app/build.gradle.kts | versionCode=18, versionName=0.13.1 |
 | app/src/main/res/values/colors.xml | 纯黑金色彩 (无旧污染) |
 | app/src/main/res/values/dimens.xml | 8px 网格间距 |
 | app/src/main/res/values/themes.xml | Material3.Dark.NoActionBar + HeadingGold |
@@ -73,6 +81,7 @@
 
 | commit | 说明 |
 |---|---|
+| 67aca76 | [0.13.1] 全局质感修复 6 项 (搜索聚焦裁剪/侧栏越界/媒体库间距/Tab选中态/继续观看置顶/详情按钮) |
 | a63f336 | 设计文档完成度补齐: Logo月牙/主演4/标签选中/serif/去阴影 |
 | 78a22dd | 细腻度修复: Banner裁剪/跨库轮转/去elevation/图标实心/黑字/去更多 |
 | 1f7e303 | UI对比修复(设计稿9项) |
@@ -86,3 +95,4 @@
 - 详情页: 品牌Logo+金标题+元信息顺序+2按钮+主演+推荐+媒体三卡
 - 播放器: EXO 初始化+play+ASS 字幕, 零崩溃
 - 整体: 无 elevation 阴影, 图标干净扁平, 文字无阴影
+- **v0.13.1 装盒复验**: 搜索聚焦首张海报边框完整无裁剪不压相邻 ✅ / 侧栏到底不越界 ✅ / 媒体库等距间隔无重叠 ✅ / Tab 选中态 ✅ / 继续观看置顶 ✅ / 详情三按钮胶囊形文字完整聚焦清晰 ✅ / 大家都在看 4 张 ✅
